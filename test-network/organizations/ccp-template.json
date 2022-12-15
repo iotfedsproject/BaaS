@@ -1,0 +1,85 @@
+{
+    "name": "test-network-${ORG}",
+    "version": "1.0.0",
+    "client": {
+        "organization": "${ORG}",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        }
+    },
+    "organizations": {
+        "${ORG}": {
+            "mspid": "${ORG}MSP",
+            "peers": [
+                "peer0.${ORG}.iti.gr",
+                "peer1.${ORG}.iti.gr",
+                "peer2.${ORG}.iti.gr",
+                "peer3.${ORG}.iti.gr"
+            ],
+            "certificateAuthorities": [
+                "ca.${ORG}.iti.gr"
+            ]
+        }
+    },
+    "peers": {
+        "peer0.${ORG}": {
+            "url": "grpcs://localhost:${P0PORT}",
+            "tlsCACerts": {
+                "pem": "${PEERPEM}"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.${ORG}.iti.gr",
+                "hostnameOverride": "peer0.${ORG}.iti.gr"
+            }
+        }
+        ,
+        "peer1.${ORG}": {
+            "url": "grpcs://localhost:${P1PORT}",
+            "tlsCACerts": {
+                "pem": "${PEERPEM}"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer1.${ORG}.iti.gr",
+                "hostnameOverride": "peer1.${ORG}.iti.gr"
+            }
+        }
+        ,
+        "peer2.${ORG}": {
+            "url": "grpcs://localhost:${P2PORT}",
+            "tlsCACerts": {
+                "pem": "${PEERPEM}"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer2.${ORG}.iti.gr",
+                "hostnameOverride": "peer2.${ORG}.iti.gr"
+            }
+        }
+        ,
+        "peer3.${ORG}": {
+            "url": "grpcs://localhost:${P3PORT}",
+            "tlsCACerts": {
+                "pem": "${PEERPEM}"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer3.${ORG}.iti.gr",
+                "hostnameOverride": "peer3.${ORG}.iti.gr"
+            }
+        }
+    },
+    "certificateAuthorities": {
+        "ca.${ORG}.iti.gr": {
+            "url": "https://localhost:${CAPORT}",
+            "caName": "ca-${ORG}",
+            "tlsCACerts": {
+                "pem": ["${CAPEM}"]
+            },
+            "httpOptions": {
+                "verify": false
+            }
+        }
+    }
+}

@@ -1,0 +1,294 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+version: '3.7'
+
+volumes:
+  orderer0.orderer.iti.gr:
+  # orderer1.orderer.iti.gr:
+  peer0.iotfeds.iti.gr:
+  peer1.iotfeds.iti.gr:
+  peer2.iotfeds.iti.gr:
+  peer3.iotfeds.iti.gr:
+
+
+networks:
+  test:
+    name: fabric_test
+
+services:
+
+  orderer0.orderer.iti.gr:
+    container_name: orderer0.orderer.iti.gr
+    image: hyperledger/fabric-orderer:latest
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
+      - ORDERER_CHANNELPARTICIPATION_ENABLED=true
+      - ORDERER_ADMIN_TLS_ENABLED=true
+      - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_ADMIN_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:7053
+      - ORDERER_OPERATIONS_LISTENADDRESS=0.0.0.0:17050
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+        - ../system-genesis-block/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../organizations/ordererOrganizations/orderer.iti.gr/orderers/orderer0.orderer.iti.gr/msp:/var/hyperledger/orderer/msp
+        - ../organizations/ordererOrganizations/orderer.iti.gr/orderers/orderer0.orderer.iti.gr/tls/:/var/hyperledger/orderer/tls
+        - orderer0.orderer.iti.gr:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+      - 7053:7053
+      - 17050:17050
+    networks:
+      - test
+
+
+  # orderer1.orderer.iti.gr:
+  #   container_name: orderer1.orderer.iti.gr
+  #   image: hyperledger/fabric-orderer:latest
+  #   labels:
+  #     service: hyperledger-fabric
+  #   environment:
+  #     - FABRIC_LOGGING_SPEC=INFO
+  #     - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+  #     - ORDERER_GENERAL_LISTENPORT=7049
+  #     - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+  #     - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+  #     # enabled TLS
+  #     - ORDERER_GENERAL_TLS_ENABLED=true
+  #     - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+  #     - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+  #     - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+  #     - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+  #     - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+  #     - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+  #     - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
+  #     - ORDERER_CHANNELPARTICIPATION_ENABLED=true
+  #     - ORDERER_ADMIN_TLS_ENABLED=true
+  #     - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+  #     - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+  #     - ORDERER_ADMIN_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+  #     - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+  #     - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:7059
+  #     - ORDERER_OPERATIONS_LISTENADDRESS=0.0.0.0:17057
+  #   working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+  #   command: orderer
+  #   volumes:
+  #       - ../system-genesis-block/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+  #       - ../organizations/ordererOrganizations/orderer.iti.gr/orderers/orderer1.orderer.iti.gr/msp:/var/hyperledger/orderer/msp
+  #       - ../organizations/ordererOrganizations/orderer.iti.gr/orderers/orderer1.orderer.iti.gr/tls/:/var/hyperledger/orderer/tls
+  #       - orderer1.orderer.iti.gr:/var/hyperledger/production/orderer
+  #   ports:
+  #     - 7049:7049
+  #     - 7059:7059
+  #     - 17057:17057
+  #   networks:
+  #     - test
+
+
+  peer0.iotfeds.iti.gr:
+      container_name: peer0.iotfeds.iti.gr
+      image: hyperledger/fabric-peer:latest
+      labels:
+        service: hyperledger-fabric
+      environment:
+        #Generic peer variables
+        - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+        - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_test
+        - FABRIC_LOGGING_SPEC=INFO
+        #- FABRIC_LOGGING_SPEC=DEBUG
+        - CORE_PEER_TLS_ENABLED=true
+        - CORE_PEER_PROFILE_ENABLED=false
+        - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+        - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+        - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+        # Peer specific variables
+        - CORE_PEER_ID=peer0.iotfeds.iti.gr
+        - CORE_PEER_ADDRESS=peer0.iotfeds.iti.gr:7051
+        - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+        - CORE_PEER_CHAINCODEADDRESS=peer0.iotfeds.iti.gr:7052
+        - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+        - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.iotfeds.iti.gr:7051 peer1.iotfeds.iti.gr:9051 peer2.iotfeds.iti.gr:11051 peer3.iotfeds.iti.gr:13051
+        - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.iotfeds.iti.gr:7051
+        - CORE_PEER_LOCALMSPID=iotfedsMSP
+        - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:17051
+      volumes:
+          - ${DOCKER_SOCK}:/host/var/run/docker.sock
+          - ../organizations/peerOrganizations/iotfeds.iti.gr/peers/peer0.iotfeds.iti.gr/msp:/etc/hyperledger/fabric/msp
+          - ../organizations/peerOrganizations/iotfeds.iti.gr/peers/peer0.iotfeds.iti.gr/tls:/etc/hyperledger/fabric/tls
+          - peer0.iotfeds.iti.gr:/var/hyperledger/production
+      working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+      command: peer node start
+      ports:
+        - 7051:7051
+        - 17051:17051
+      networks:
+        - test
+
+
+  peer1.iotfeds.iti.gr:
+    container_name: peer1.iotfeds.iti.gr
+    image: hyperledger/fabric-peer:latest
+    labels:
+      service: hyperledger-fabric
+    environment:
+      #Generic peer variables
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_test
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      # Peer specific variables
+      - CORE_PEER_ID=peer1.iotfeds.iti.gr
+      - CORE_PEER_ADDRESS=peer1.iotfeds.iti.gr:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.iotfeds.iti.gr:9052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.iotfeds.iti.gr:7051 peer1.iotfeds.iti.gr:9051 peer2.iotfeds.iti.gr:11051 peer3.iotfeds.iti.gr:13051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.iotfeds.iti.gr:9051
+      - CORE_PEER_LOCALMSPID=iotfedsMSP
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:19051
+    volumes:
+        - ${DOCKER_SOCK}:/host/var/run/docker.sock
+        - ../organizations/peerOrganizations/iotfeds.iti.gr/peers/peer1.iotfeds.iti.gr/msp:/etc/hyperledger/fabric/msp
+        - ../organizations/peerOrganizations/iotfeds.iti.gr/peers/peer1.iotfeds.iti.gr/tls:/etc/hyperledger/fabric/tls
+        - peer1.iotfeds.iti.gr:/var/hyperledger/production
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    ports:
+      - 9051:9051
+      - 19051:19051
+    networks:
+      - test
+
+
+
+  peer2.iotfeds.iti.gr:
+    container_name: peer2.iotfeds.iti.gr
+    image: hyperledger/fabric-peer:latest
+    labels:
+      service: hyperledger-fabric
+    environment:
+      #Generic peer variables
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_test
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      # Peer specific variables
+      - CORE_PEER_ID=peer2.iotfeds.iti.gr
+      - CORE_PEER_ADDRESS=peer2.iotfeds.iti.gr:11051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:11051
+      - CORE_PEER_CHAINCODEADDRESS=peer2.iotfeds.iti.gr:11052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.iotfeds.iti.gr:7051 peer1.iotfeds.iti.gr:9051 peer2.iotfeds.iti.gr:11051 peer3.iotfeds.iti.gr:13051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2.iotfeds.iti.gr:11051
+      - CORE_PEER_LOCALMSPID=iotfedsMSP
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:21051
+    volumes:
+        - ${DOCKER_SOCK}:/host/var/run/docker.sock
+        - ../organizations/peerOrganizations/iotfeds.iti.gr/peers/peer2.iotfeds.iti.gr/msp:/etc/hyperledger/fabric/msp
+        - ../organizations/peerOrganizations/iotfeds.iti.gr/peers/peer2.iotfeds.iti.gr/tls:/etc/hyperledger/fabric/tls
+        - peer2.iotfeds.iti.gr:/var/hyperledger/production
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    ports:
+      - 11051:11051
+      - 21051:21051
+    networks:
+      - test
+
+
+
+  peer3.iotfeds.iti.gr:
+    container_name: peer3.iotfeds.iti.gr
+    image: hyperledger/fabric-peer:latest
+    labels:
+      service: hyperledger-fabric
+    environment:
+      #Generic peer variables
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_test
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      # Peer specific variables
+      - CORE_PEER_ID=peer3.iotfeds.iti.gr
+      - CORE_PEER_ADDRESS=peer3.iotfeds.iti.gr:13051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:13051
+      - CORE_PEER_CHAINCODEADDRESS=peer3.iotfeds.iti.gr:13052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:13052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.iotfeds.iti.gr:7051 peer1.iotfeds.iti.gr:9051 peer2.iotfeds.iti.gr:11051 peer3.iotfeds.iti.gr:13051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer3.iotfeds.iti.gr:13051
+      - CORE_PEER_LOCALMSPID=iotfedsMSP
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:23051
+    volumes:
+        - ${DOCKER_SOCK}:/host/var/run/docker.sock
+        - ../organizations/peerOrganizations/iotfeds.iti.gr/peers/peer3.iotfeds.iti.gr/msp:/etc/hyperledger/fabric/msp
+        - ../organizations/peerOrganizations/iotfeds.iti.gr/peers/peer3.iotfeds.iti.gr/tls:/etc/hyperledger/fabric/tls
+        - peer3.iotfeds.iti.gr:/var/hyperledger/production
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    ports:
+      - 13051:13051
+      - 23051:23051
+    networks:
+      - test
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:latest
+    labels:
+      service: hyperledger-fabric
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - ../organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations
+        - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+    depends_on:
+      - peer0.iotfeds.iti.gr
+      - peer1.iotfeds.iti.gr
+      - peer2.iotfeds.iti.gr
+      - peer3.iotfeds.iti.gr
+
+
+    networks:
+      - test

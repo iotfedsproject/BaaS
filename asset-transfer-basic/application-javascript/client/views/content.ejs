@@ -1,0 +1,42 @@
+<%- include('header.ejs') %>
+<div class="cast-ballot">
+  <img alt="IoTFeds logo" src="/img/iotfeds-logo2.png">
+  <h1>IoTFeds Voting System</h1>
+  <br>
+  <h3>Hello! You are invited to take part in the following voting procedure:</h3>
+  <br>
+
+  <%
+  if (descr['votingType'] === "addition") { %>
+    <p id="voting_descr">  Addition of user <%= descr['memberID']  %> to federation <%= descr['fedID']  %> requested by user <%= descr['requestorID']  %> </p>
+  <% }
+  if (descr['votingType'] === "removal") { %>
+    <p id="voting_descr">  Removal of user <%= descr['memberID']  %> from federation <%= descr['fedID']  %> requested by user <%= descr['requestorID']  %> </p>
+  <% }
+  if (descr['votingType'] === "rule change") { %>
+    <p id="voting_descr">  Change of rules to federation <%= descr['fedID']  %> requested by user <%= descr['requestorID'] %>. Proposed change at at <%= descr['proposedRules']['changedField']%></p><br>
+    <p id="rule_set"> where current value is "<%= descr['proposedRules']['current'] %>" and proposed is  "<%= descr['proposedRules']['proposed'] %>" </p>
+  <% } %>
+
+  <br>
+  <form action="/castBallot" method="post">
+    <div class="posts">
+      <input type="radio" id="vote_yes" name="vote" value="yes" v-model="picked" onclick="manage()">
+      <label for="yes">Yes</label>
+      <br>
+      <input type="radio" id="vote_no" name="vote" value="no" v-model="picked" onclick="manage()">
+      <label for="no">No</label>
+      <br>
+      <input type="radio" id="vote_abstain" name="vote" value="abstain" v-model="picked" onclick="manage()">
+      <label for="abstain">Abstain</label>
+      <br>
+      <br>
+      <button type="submit" id="vote_submit" class="btn" disabled>Submit Vote</button>
+    </div>
+  </form>
+</div>
+<script>
+  function manage() {
+        document.getElementById('vote_submit').disabled = false;
+  }
+</script>
