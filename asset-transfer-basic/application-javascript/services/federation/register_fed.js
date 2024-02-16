@@ -9,6 +9,7 @@ const { buildCCPOrg1, buildWallet } = require('../../../../test-application/java
 
 const channelName = 'mychannel';
 const chaincodeName = 'federationsmanage';
+const chaincodeName2 = 'basic';
 const mspOrg1 = 'iotfedsMSP';
 
 const walletPath = path.join(__dirname,'../..','wallet');
@@ -25,9 +26,9 @@ const registerFedToBc = async(req, res, next) => {
     const fed_id = req.body.fed_id;
     const creator_id = req.body.creator_id;
 		const inf_model = req.body.inf_model;
-    const related_applications = req.body.related_applications;
+    const related_applications = JSON.stringify(req.body.related_applications);
     const rules = JSON.stringify(req.body.rules);
-		console.log(rules);
+		console.log(related_applications);
 
     try {
 
@@ -67,20 +68,24 @@ const registerFedToBc = async(req, res, next) => {
 
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
-
+        const contract2 = network.getContract(chaincodeName2);
 
         console.log('\n--> Submit Transaction: CreateFed, creates new federation with ID, creator id, related applications, members and rules');
         let result = await contract.submitTransaction('CreateFed', fed_id, creator_id, inf_model, related_applications, rules);
-        console.log("hello")
         console.log('*** Result: committed', result, '***');
 
         console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
 
 
+        await registerAndEnrollUser(caClient, wallet, mspOrg1, fed_id, 'ioTFeds.department1');
 
+        console.log('\n--> Submit Transaction: UpdateUserFED, update user fed_owner field to true');
 
-        res.status(200).send("OK!");
+        await contract2.submitTransaction('UpdateUserFed', creator_id);
+        // console.log('*** Result: committed');
+
+        res.status(200).send({message: "OK!"});
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -94,7 +99,7 @@ const registerFedToBc = async(req, res, next) => {
 
         console.log('Federation creation failed with error: '+error);
 
-        res.status(403).send('Registration failed ...')
+        res.status(403).send({error: 'Registration failed ...'+error})
 
 
     }

@@ -9,6 +9,7 @@ const { buildCCPOrg1, buildWallet } = require('../../../../test-application/java
 
 const channelName = 'mychannel';
 const chaincodeName = 'basic';
+const chaincodeName2 = 'products';
 const mspOrg1 = 'iotfedsMSP';
 
 
@@ -68,18 +69,73 @@ const deleteUser = async(req, res, next) => {
 
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
+        const contract2 = network.getContract(chaincodeName2);
+        // existingTokens = await contract2.submitTransaction('AssetExists', id);
+        // if (existingTokens){
+        //     console.log(`*** existingTokens: ${prettyJSONString(existingTokens.toString())}`);
+        //   throw new Error(`Tokens exist for user ${id}.`);
+        // }
 
+		console.log('\n--> Submit Transaction: DeleteUser, deletes user with ID');
+		let result = await contract.submitTransaction('DeleteUser', id);
 
-				console.log('\n--> Submit Transaction: DeleteUser, deletes user with ID');
-				result = await contract.submitTransaction('DeleteUser', id);
-				console.log('*** Result: committed');
-				if (`${result}` !== '') {
-					console.log(`*** Result: ${prettyJSONString(result.toString())}`);
-				}
+				//console.log(`*** Result: committed: ${JSON.stringify(result)}`);
+        if (result==0){
+            res.status(200).send({message: "OK!"});
+        }else{
+            result=JSON.parse(result)
+            let assocPlatf=Object.values(result.AssociatedPlatforms);
+           
+            let resources=[]
+            for (var k=0;k<assocPlatf.length;k++){
+                assocPlatf[k].forEach((index)=>{
+                    resources.push(index)
+                })
+            }     
+            console.log("Resources: ",resources)
+            let deleteFlag=1;
+            let tbp= Date.now();
+            for (var i=0;i<resources.length;i++){
+                console.log('\n--> Evaluate Transaction: GetResource, get resource info');
+                resources[i] = await contract2.evaluateTransaction('GetResource', resources[i]);
+                resources[i]=JSON.parse(resources[i]);
+                console.log("fdfs: ",resources[i].fed_id.length)
 
+                if (resources[i].fed_id.length>0 && tbp<resources[i].Hr){
+                    deleteFlag=0;
+                }
+            }
+            console.log("deleteFlag: ",deleteFlag)
 
-        res.status(200).send(result);
-				// res.status(200).send(result);
+            if (deleteFlag==0){
+                throw new Error(`User ${id} has resources on Federation marketplace.`);
+            }else{
+                for (var i=0;i<resources.length;i++){
+                    await contract2.evaluateTransaction('UpdateResource2', resources[i]);
+                }
+                if (result.ActiveProducts.length>0){
+                    for (var i=0;i<result.ActiveProducts.length;i++){
+                      await contract2.submitTransaction('DeleteProduct', result.ActiveProducts[i],id);
+                    }
+                }
+                console.log('\n--> Submit Transaction: DeleteUser2, deletes user with ID');
+                await contract.submitTransaction('DeleteUser2', id);
+                res.status(200).send({message: "OK!"});
+            }
+        }
+ 
+                // result.forEach(async (index)=>{
+                // console.log("ID: ",index)
+                //     });
+				// if (`${result}` !== '') {
+				// 	console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+				// }
+        // var fs = require('fs');
+        // var filePath = `./wallet/${id}.id`; 
+        // fs.unlinkSync(filePath);
+
+        //res.status(200).send(JSON.parse(result));
+				//res.status(200).send(resources);
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -93,7 +149,7 @@ const deleteUser = async(req, res, next) => {
 
         console.log('User deletion failed with error: '+error);
 
-        res.status(400).send('Deletion failed ...')
+        res.status(400).send({error: 'Deletion failed: '+error})
 
 
     }

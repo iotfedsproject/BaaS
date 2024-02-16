@@ -75,7 +75,7 @@ const getAllUserInfo = async(req, res, next) => {
 				console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
 
-        res.status(200).send(result);
+        res.status(200).send(JSON.parse(result));
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -89,7 +89,7 @@ const getAllUserInfo = async(req, res, next) => {
 
         console.log('All user info access failed with error: '+error);
 
-        res.status(403).send('Access failed ...')
+        res.status(403).send({error: 'Access failed: '+error})
 
 
     }

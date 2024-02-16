@@ -12,6 +12,7 @@ const {sendmail} = require('../../nodemailer/node_modules/nodemailer/sendmail');
 const channelName = 'mychannel';
 const chaincodeName = 'federationsmanage';
 const chaincodeNameUser = 'basic';
+const chaincodeProducts = 'products';
 const mspOrg1 = 'iotfedsMSP';
 
 
@@ -83,57 +84,89 @@ const removeFedMemberRequest = async(req, res, next) => {
 
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
-
-
-        console.log('\n--> Submit Transaction: RemoveFedMemberRequest, requests to remove a member of a federation');
-        result = await contract.submitTransaction('RemoveFedMemberRequest', requestor_id, user_id, fed_id);
-        console.log('*** Result: committed');
-        if (`${result}` !== '') {
-            console.log(`*** Result: ${prettyJSONString(result.toString())}`);
-        }
-
-        result = JSON.parse(result);
-        console.log(result['votes'])
-
-				let voting_id = result['ID'];
-        let votes = JSON.stringify(result['votes']);
-
-        let usernames = [];
-        let tokens = [];
-
-        for (var v in result['votes']){
-
-            if (result['votes'].hasOwnProperty(v)){
-
-                usernames.push(v);
-                // tokens.push(voting_id.concat("/",v))
-								tokens.push(generateAccessToken(voting_id, v));
-            }
-        }
-
-        // Get the contract from the network.
+        const contract2 = network.getContract(chaincodeProducts);
         const contractUser = network.getContract(chaincodeNameUser);
 
-        console.log('\n--> Evaluate Transaction: GetMails, get the mail of the voters');
-        let votersMail = await contractUser.evaluateTransaction('GetMails',votes);
+        let result2 = await contractUser.evaluateTransaction('ReadUser', user_id);
 
-        let votersMailArray = JSON.parse(votersMail);
-				console.log(votersMailArray);
+        result2=JSON.parse(result2)
+        let assocPlatf=Object.values(result2.AssociatedPlatforms);
+       
+        let resources=[]
+        for (var k=0;k<assocPlatf.length;k++){
+            assocPlatf[k].forEach((index)=>{
+                resources.push(index)
+            })
+        }     
+        console.log("Resources: ",resources)
+        let deleteFlag=1;
+        let tbp= Date.now();
+        for (var i=0;i<resources.length;i++){
+            console.log('\n--> Evaluate Transaction: GetResource, get resource info');
+            resources[i] = await contract2.evaluateTransaction('GetResource', resources[i]);
+            resources[i]=JSON.parse(resources[i]);
+            console.log("fdfs: ",resources[i].fed_id.length)
 
-				function sleep(ms) {
-    			return new Promise(resolve => setTimeout(resolve, ms));
-				}
-
-        for (let i=0; i<votersMailArray.length; i++){
-
-            console.log(votersMailArray[i]+" "+tokens[i])
-
-            sendmail(votersMailArray[i], tokens[i]);
-						await sleep(1000);
+            if (resources[i].fed_id.length>0 && tbp<resources[i].Hr){
+                deleteFlag=0;
+            }
         }
+        console.log("deleteFlag: ",deleteFlag)
+
+        if (deleteFlag==0){
+            throw new Error(`User ${user_id} has resources on Federation marketplace.`);
+        }else{
+
+          console.log('\n--> Submit Transaction: RemoveFedMemberRequest, requests to remove a member of a federation');
+          let result = await contract.submitTransaction('RemoveFedMemberRequest', requestor_id, user_id, fed_id);
+          console.log('*** Result: committed');
+          if (`${result}` !== '') {
+              console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+          }
+
+          result = JSON.parse(result);
+          console.log(result['votes'])
+
+          let voting_id = result['ID'];
+          let votes = JSON.stringify(result['votes']);
+
+          let usernames = [];
+          let tokens = [];
+
+          for (var v in result['votes']){
+
+              if (result['votes'].hasOwnProperty(v)){
+
+                  usernames.push(v);
+                  // tokens.push(voting_id.concat("/",v))
+                  tokens.push(generateAccessToken(voting_id, v));
+              }
+          }
+
+          // Get the contract from the network.
+          
+
+          console.log('\n--> Evaluate Transaction: GetMails, get the mail of the voters');
+          let votersMail = await contractUser.evaluateTransaction('GetMails',votes);
+
+          let votersMailArray = JSON.parse(votersMail);
+          console.log(votersMailArray);
+
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
+          for (let i=0; i<votersMailArray.length; i++){
+
+              console.log(votersMailArray[i]+" "+tokens[i])
+
+              sendmail(votersMailArray[i], tokens[i]);
+              await sleep(1000);
+          }
 
 
-        res.status(200).send(result);
+          res.status(200).send(result);
+        }
 
         gateway.disconnect();
     //}
@@ -144,7 +177,7 @@ const removeFedMemberRequest = async(req, res, next) => {
 
         console.log('Request to remove a member from federation failed with error: '+error);
 
-        res.status(400).send('Request to remove a member from federation failed ...')
+        res.status(400).send({error: 'Request to remove a member from federation failed: '+error})
 
 
     }

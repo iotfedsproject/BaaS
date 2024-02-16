@@ -75,7 +75,7 @@ const removeDevice = async(req, res, next) => {
 				await contract.submitTransaction('RemoveDevice', idDevice, idPlatform);
 				console.log('*** Result: committed');
 
-        res.status(200).send("OK!");
+        res.status(200).send({message: "OK!"});
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -93,7 +93,7 @@ const removeDevice = async(req, res, next) => {
 					res.status(404).send('Deletion failed, device not found in platform')
 				}
 				else {
-					res.status(400).send('Deletion failed ...')
+					res.status(400).send({error: 'Deletion failed: '+error})
 				}
 
     }

@@ -75,7 +75,7 @@ const registerPlatform = async(req, res, next) => {
 				await contract.submitTransaction('RegisterPlatform', idPlatform, assocIdUser);
 				console.log('*** Result: committed');
 
-        res.status(200).send("OK!");
+        res.status(200).send({message: "OK!"});
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -89,7 +89,7 @@ const registerPlatform = async(req, res, next) => {
 
         console.log('Platform registration failed with error: '+error);
 
-        res.status(400).send('Update failed ...')
+        res.status(400).send({error: 'Update failed: '+error})
 
 
     }

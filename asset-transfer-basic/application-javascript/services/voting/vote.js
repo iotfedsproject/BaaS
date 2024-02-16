@@ -1,6 +1,7 @@
 const { Gateway, Wallets} = require('fabric-network');
 const path = require('path');
 const fs = require('fs');
+// var axios = require('axios');
 // const insertlog = require('../../MongoDB/controllers/insertlog');
 
 const FabricCAServices = require('fabric-ca-client');
@@ -40,21 +41,12 @@ const registerVote = async(req, res, next) => {
 	    return res.sendStatus(401);
 	  }
 
-	  jwt.verify(token, process.env.TOKEN_SECRET.toString(), (err, decoded) => {
-	    console.log(err);
-
-			if (err) {
-				return res.status(403).send('Invalid token');
-			}
-
-			voting_id = decoded.IDvoting;
-			user_id = decoded.IDvoter;
-
-		});
-
     const vote = req.body.vote;
 
     try {
+      let decoded=jwt.verify(token, process.env.TOKEN_SECRET.toString())
+      voting_id = decoded.IDvoting;
+      user_id = decoded.IDvoter;
 
 			const ccp = buildCCPOrg1();
 
@@ -105,6 +97,30 @@ const registerVote = async(req, res, next) => {
         if (`${result}` !== '') {
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
         }
+				if (!result.status) {
+
+					let IDvoting = result.ID;
+					let votingResult = await contract.submitTransaction('GetVotingResult', result);
+					let url = `https://symbiote-core.iotfeds.intracom-telecom.com/administration/generic/result?votingId=${voting_id}&status=${votingResult.toString('utf-8')}`;
+
+					var myHeaders = new Headers();
+					myHeaders.append("Content-Type", "application/json");
+
+					var raw = "";
+
+					var requestOptions = {
+						method: 'POST',
+						headers: myHeaders,
+						body: raw,
+						redirect: 'follow'
+					};
+
+					fetch(url, requestOptions)
+						.then(response => response.text())
+						.then(result => console.log(result))
+						.catch(error => console.log('error', error));
+
+				}
 
 
         res.status(200).send(result);
@@ -122,7 +138,7 @@ const registerVote = async(req, res, next) => {
 
         console.log('Register vote of user  failed with error: '+error);
 
-        res.status(400).send('Register vote of user  failed ...')
+        res.status(400).send('Register vote of user  failed: '+error)
 
 
     }

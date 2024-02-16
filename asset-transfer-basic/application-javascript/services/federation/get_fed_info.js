@@ -1,6 +1,7 @@
 const { Gateway, Wallets} = require('fabric-network');
 const path = require('path');
 const fs = require('fs');
+const url = require('url');
 // const insertlog = require('../../MongoDB/controllers/insertlog');
 
 const FabricCAServices = require('fabric-ca-client');
@@ -25,8 +26,9 @@ function prettyJSONString(inputString) {
 const getFedInfo = async(req, res, next) => {
 
     //should be given by request or taken from a token (e.g. jwt)
-    const creator_id = req.body.creator_id;
-    const fed_id = req.body.fed_id;
+		const queryObject = url.parse(req.url, true).query;
+    const creator_id = queryObject.creator_id;
+    const fed_id = queryObject.fed_id;
 
 
     try {
@@ -74,7 +76,7 @@ const getFedInfo = async(req, res, next) => {
         console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
 
-        res.status(200).send(result);
+        res.status(200).send(JSON.parse(result));
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -88,7 +90,7 @@ const getFedInfo = async(req, res, next) => {
 
         console.log('Federation info access failed with error: '+error);
 
-        res.status(403).send('Access failed ...')
+        res.status(403).send({error: 'Access failed: '+error})
 
 
     }

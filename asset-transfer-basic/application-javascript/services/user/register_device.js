@@ -9,6 +9,7 @@ const { buildCCPOrg1, buildWallet } = require('../../../../test-application/java
 
 const channelName = 'mychannel';
 const chaincodeName = 'basic';
+const chaincodeName2 = 'products';
 const mspOrg1 = 'iotfedsMSP';
 
 
@@ -31,6 +32,7 @@ const registerDevice = async(req, res, next) => {
     //should be given by request or taken from a token (e.g. jwt)
     const idPlatform = req.body.platform_id;
 		const idDevice = req.body.device_id;
+        const user=req.body.user;
 
     try {
 
@@ -69,13 +71,18 @@ const registerDevice = async(req, res, next) => {
 
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
+				const contract2 = network.getContract(chaincodeName2);
 
 
 				console.log("\n--> Submit Transaction: registers Device to a user's platform");
-				await contract.submitTransaction('RegisterDevice', idDevice, idPlatform);
+				await contract.submitTransaction('RegisterDevice', idDevice, idPlatform,user);
 				console.log('*** Result: committed');
 
-        res.status(200).send("OK!");
+				console.log('\n--> Submit Transaction: CreateResource, creates new resource with device ID in the product ledger');
+        let result = await contract2.submitTransaction('CreateResource', idDevice, idPlatform, user);
+        console.log('*** Result: committed', result, '***');
+
+        res.status(200).send({message: "OK!"});
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -89,7 +96,7 @@ const registerDevice = async(req, res, next) => {
 
         console.log('Device registration failed with error: '+error);
 
-        res.status(400).send('Update failed ...')
+        res.status(400).send({error: 'Registration failed: '+error})
 
 
     }

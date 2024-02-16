@@ -75,7 +75,7 @@ const updateUserBalance = async(req, res, next) => {
 				await contract.submitTransaction('UpdateUserBalance', id, fee);
 				console.log('*** Result: committed');
 
-        res.status(200).send("OK!");
+        res.status(200).send({message: "OK!"});
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -89,7 +89,7 @@ const updateUserBalance = async(req, res, next) => {
 
         console.log('Balance updated failed with error: '+error);
 
-        res.status(403).send('Update failed ...')
+        res.status(403).send({error: 'Update failed: '+error})
 
 
     }

@@ -1,6 +1,5 @@
+// * Copyright IBM Corp. All Rights Reserved.
 /*
-* Copyright IBM Corp. All Rights Reserved.
-*
 * SPDX-License-Identifier: Apache-2.0
 */
 
@@ -11,6 +10,7 @@ const stringify  = require('json-stringify-deterministic');
 const sortKeysRecursive  = require('sort-keys-recursive');
 const { Contract } = require('fabric-contract-api');
 const FedManage = require('./fedManage.js');
+// var axios = require('axios');
 
 // const {sendmail} = require('../nodemailer/nodemailer/app');
 // const { setTimeout: setTimeoutPromise } = require('node:timers/promises');
@@ -80,9 +80,32 @@ class Voting extends Contract {
     currentVoting["votes"][voter] = vote;
 
     if (!(Object.values(currentVoting['votes']).indexOf('pending') > -1)) {
-      
-      currentVoting = await this.TerminateVoting(ctx, currentVoting);
+
+      let votingResult = await this.TerminateVoting(ctx, currentVoting);
       // TODO: call to ICOM's endpoint
+      // call to ICOM's endpoint
+      // let IDvoting = votingResult[0].ID;
+      // let url = `https://symbiote-core.iotfeds.intracom-telecom.com/administration/generic/result?votingId=${IDvoting}&status=${votingResult[1]}`;
+      // var data = '';
+      //
+      // var config = {
+      //   method: 'post',
+      //   url: url,
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   },
+      //   data : data
+      // };
+      //
+      // axios(config)
+      // .then(function (response) {
+      //   throw new Error('works');
+      // })
+      // .catch(function (error) {
+      //   throw new Error(error);
+      // });
+
+
     }
     else {
       await ctx.stub.putState(v_id, Buffer.from(stringify(sortKeysRecursive(currentVoting))));
@@ -92,7 +115,17 @@ class Voting extends Contract {
   }
 
   // GetVotingResult, extracts the result of a proposal once it is terminated
-  async GetVotingResult(ctx, currentVoting) {
+  async GetVotingResult(ctx, Voting) {
+
+    // let currentVoting = JSON.parse(Voting);
+    let currentVoting;
+    if (typeof Voting !== "object") {
+      currentVoting = JSON.parse(Voting);
+    }
+    else {
+      currentVoting = Voting;
+    }
+
 
     const fedId = currentVoting['federation'];
     let currentFed = await this.ReadAsset(ctx, fedId);
@@ -106,21 +139,11 @@ class Voting extends Contract {
 
     let votingResult = '';
     if (perc > acceptancePercentage) {
-      votingResult = 'accepted';
-      // TODO: modify the respected federation with the accepted proposal
-      if (currentVoting.descr.votingType === 'addition') {
-        await this.AcceptFedMember(ctx, currentVoting.federation, currentVoting.descr.memberID);
-      }
-      else if (currentVoting.descr.votingType === 'removal') {
-        await this.LeaveFed(ctx, currentVoting.descr.memberID, currentVoting.federation);
-      }
-      else {
-        await this.AcceptRuleChange(ctx, currentVoting.federation, currentVoting.descr.proposedRules);
-      }
+      votingResult = 'ACCEPTED';
     }
 
     else {
-      votingResult = 'rejected';
+      votingResult = 'REJECTED';
     }
 
     return votingResult;
@@ -164,10 +187,29 @@ class Voting extends Contract {
 
     voting['status'] = false; // deactivate voting
     let votingResult = await this.GetVotingResult(ctx, voting);
+    if (votingResult === "ACCEPTED") {
+      await this.AcceptedVotingActions(ctx, voting);
+    }
+    // let resultICOM = votingResult.toUppperCase();
     let archivedVotings = await this.ArchiveVoting(ctx, voting, votingResult);
-    // TODO: call to ICOM's endpoint
 
-    return voting;
+
+    return [voting, votingResult];
+  }
+
+  // Actions to take once a voting is accepted
+  async AcceptedVotingActions(ctx, currentVoting) {
+    if (currentVoting.descr.votingType === 'addition') {
+      let memberID = await this.GetIDByUsername(ctx, currentVoting.descr.memberID);
+      await this.AcceptFedMember(ctx, currentVoting.federation, memberID);
+    }
+    else if (currentVoting.descr.votingType === 'removal') {
+      let memberID = await this.GetIDByUsername(ctx, currentVoting.descr.memberID);
+      await this.LeaveFed(ctx, memberID, currentVoting.federation);
+    }
+    else {
+      await this.AcceptRuleChange(ctx, currentVoting.federation, currentVoting.descr.proposedRules);
+    }
   }
 
   // AcceptFedMember adds a new member to a federation, if the voting result was positive
@@ -181,7 +223,7 @@ class Voting extends Contract {
     let currentFed = await this.ReadAsset(ctx, fed_id);
     currentFed = JSON.parse(currentFed);
     currentFed.members_ids.push(member_id);
-
+    await ctx.stub.invokeChaincode('basic', ['UpdateUserFedMember', member_id, fed_id], 'mychannel');
     return ctx.stub.putState(fed_id, Buffer.from(stringify(sortKeysRecursive(currentFed))));
 
   };
@@ -197,7 +239,30 @@ class Voting extends Contract {
 
     let currentFed = await this.ReadAsset(ctx, fed_id);
     currentFed = JSON.parse(currentFed);
-    currentFed['rules'] = new_rules;
+    let objKey = new_rules.changedField;
+    if (objKey.includes(',')) {
+      let splits = objKey.split(',');
+       objKey = splits[splits.length - 1].trim();
+    }
+
+    // function that searches for key in object recursively
+    function updateValue(obj, key, newValue) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = newValue;
+      }
+      else {
+        let keys = Object.keys(obj);
+        for (let i = 0; i < keys.length; i++) {
+          if (typeof obj[keys[i]] === 'object') {
+            updateValue(obj[keys[i]], key, newValue);
+          }
+        }
+      }
+    }
+
+    updateValue(currentFed['rules'], objKey, new_rules.proposed);
+    // currentFed['rules'][objKey] = new_rules.proposed;
+    // currentFed['rules'] = new_rules;
 
     return ctx.stub.putState(fed_id, Buffer.from(stringify(sortKeysRecursive(currentFed))));
 
@@ -220,7 +285,8 @@ class Voting extends Contract {
         throw new Error(`The user ${user_id} is not registered in federation ${fed_id}`);
       }
 
-
+      await ctx.stub.invokeChaincode('basic', ['RemoveFedFromUser', user_id, fed_id], 'mychannel');
+      
       currentFed['members_ids'] = currentFed['members_ids'].filter(e => e !== user_id); // drop user
       await ctx.stub.putState(fed_id, Buffer.from(stringify(sortKeysRecursive(currentFed))));
       return currentFed;
@@ -246,8 +312,8 @@ class Voting extends Contract {
     // Terminate and archive the expired ones
     let terminatedVotings = [];
     for (const voting of expiredVotings) {
-      let terminatedVoting = await this.TerminateVoting(ctx, voting);
-      terminatedVotings.push(terminatedVoting);
+      let votingResult = await this.TerminateVoting(ctx, voting);
+      terminatedVotings.push(votingResult);
     }
 
     return JSON.stringify(terminatedVotings);
@@ -294,6 +360,13 @@ class Voting extends Contract {
           result = await iterator.next();
       }
       return allResults;
+  }
+
+  async GetIDByUsername(ctx, orgName) {
+    let userInvoke = await ctx.stub.invokeChaincode('basic', ['ReadUserByName', orgName], 'mychannel'); //invoke func from another CC
+    let user = userInvoke.payload.toString('utf8'); //read payload response and convert to string
+    let userObj = JSON.parse(user);
+    return userObj.ID;
   }
 
   // Gets all assets of input docType

@@ -9,6 +9,8 @@ const { buildCCPOrg1, buildWallet } = require('../../../../test-application/java
 
 const channelName = 'mychannel';
 const chaincodeName = 'federationsmanage';
+const chaincodeName2 = 'basic';
+const chaincodeName3 = 'products';
 const mspOrg1 = 'iotfedsMSP';
 
 
@@ -65,19 +67,49 @@ const leaveFed = async(req, res, next) => {
 
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
+        const contract2 = network.getContract(chaincodeName2);
+        const contract3 = network.getContract(chaincodeName3);
 
+        let result2 = await contract2.evaluateTransaction('ReadUser', user_id);
 
-        console.log('\n--> Submit Transaction: LeaveFed, deletes user from federation under conditions');
-        result = await contract.submitTransaction('LeaveFed', user_id, fed_id);
-        console.log('*** Result: committed');
-        if (`${result}` !== '') {
-            console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+        result2=JSON.parse(result2)
+        let assocPlatf=Object.values(result2.AssociatedPlatforms);
+       
+        let resources=[]
+        for (var k=0;k<assocPlatf.length;k++){
+            assocPlatf[k].forEach((index)=>{
+                resources.push(index)
+            })
+        }     
+        console.log("Resources: ",resources)
+        let deleteFlag=1;
+        let tbp= Date.now();
+        for (var i=0;i<resources.length;i++){
+            console.log('\n--> Evaluate Transaction: GetResource, get resource info');
+            resources[i] = await contract3.evaluateTransaction('GetResource', resources[i]);
+            resources[i]=JSON.parse(resources[i]);
+            console.log("fdfs: ",resources[i].fed_id.length)
+
+            if (resources[i].fed_id.length>0 && tbp<resources[i].Hr){
+                deleteFlag=0;
+            }
         }
+        console.log("deleteFlag: ",deleteFlag)
 
+        if (deleteFlag==0){
+            throw new Error(`User ${user_id} has resources on Federation marketplace.`);
+        }else{
 
-        res.status(200).send(result);
+            console.log('\n--> Submit Transaction: LeaveFed, deletes user from federation under conditions');
+            let result = await contract.submitTransaction('LeaveFed', user_id, fed_id);
+            console.log('*** Result: committed');
+            if (`${result}` !== '') {
+                console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+            }
+
+            res.status(200).send(JSON.parse(result));
 				// res.status(200).send(result);
-
+        }
     //finally {
         // Disconnect from the gateway when the application is closing
         // This will close all connections to the network
@@ -90,7 +122,7 @@ const leaveFed = async(req, res, next) => {
 
         console.log('User deletion from federation failed with error: '+error);
 
-        res.status(400).send('User leaving failed ...')
+        res.status(400).send({error: 'User leaving failed: '+error})
 
 
     }

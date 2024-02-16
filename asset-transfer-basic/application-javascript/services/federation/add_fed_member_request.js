@@ -43,7 +43,9 @@ const addFedMemberRequest = async(req, res, next) => {
     const member_id = req.body.member_id;
 
     try {
-
+        if (requestor_id==member_id){
+            return res.status(400).send("Requestor_id can't be the same with the candidate member_id of federation")
+        }
 			const ccp = buildCCPOrg1();
 
 			// build an instance of the fabric ca services client based on
@@ -84,7 +86,7 @@ const addFedMemberRequest = async(req, res, next) => {
 
 
         console.log('\n--> Submit Transaction: AddFedMemberRequest, initializes voting for the addition of a member');
-        result = await contract.submitTransaction('AddFedMemberRequest', requestor_id, fed_id, member_id);
+        result = await contract.submitTransaction('AddFedMemberRequest', member_id, fed_id, requestor_id);
         console.log('*** Result: committed');
         if (`${result}` !== '') {
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
@@ -142,7 +144,7 @@ const addFedMemberRequest = async(req, res, next) => {
 
         console.log('Add new federation member request  failed with error: '+error);
 
-        res.status(400).send('Add new federation member request failed ...')
+        res.status(400).send({error: 'Add new federation member request failed: '+error})
 
 
     }

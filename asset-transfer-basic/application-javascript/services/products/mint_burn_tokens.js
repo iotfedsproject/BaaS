@@ -1,0 +1,103 @@
+const { Gateway, Wallets} = require('fabric-network');
+const path = require('path');
+const fs = require('fs');
+// const insertlog = require('../../MongoDB/controllers/insertlog');
+
+const FabricCAServices = require('fabric-ca-client');
+const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../../../../test-application/javascript/CAUtil.js');
+const { buildCCPOrg1, buildWallet } = require('../../../../test-application/javascript/AppUtil.js');
+
+const channelName = 'mychannel';
+const chaincodeName = 'token_erc20';
+const mspOrg1 = 'iotfedsMSP';
+
+const walletPath = path.join(__dirname,'../..','wallet');
+
+
+function prettyJSONString(inputString) {
+	return JSON.stringify(JSON.parse(inputString), null, 2);
+}
+
+
+const mintBurnTokens = async(req, res, next) => {
+
+    let amount = req.body.amount;
+    let action=req.body.action;
+    //let user=req.body.user;
+
+    try {
+
+        const ccp = buildCCPOrg1();
+
+        // build an instance of the fabric ca services client based on
+        // the information in the network configuration
+        const caClient = buildCAClient(FabricCAServices, ccp, 'ca.iotfeds.iti.gr');
+
+        // setup the wallet to hold the credentials of the application user
+        // const wallet = await buildWallet(Wallets, walletPath);
+        // const wallet = await Wallets.newFileSystemWallet(path.join(walletPath, 'wallet'));
+        const wallet = await Wallets.newFileSystemWallet(walletPath);
+
+        await wallet.get('iotFedsAdmin');
+
+
+        // Create a new gateway instance for interacting with the fabric network.
+        // In a real application this would be done as the backend server session is setup for
+        // a user that has been verified.
+        const gateway = new Gateway();
+
+        // setup the gateway instance
+        // The user will now be able to create connections to the fabric network and be able to
+        // submit transactions and query. All transactions submitted by this gateway will be
+        // signed by this user using the credentials stored in the wallet.
+
+        console.log("Trying to connect to gateway...")
+        await gateway.connect(ccp, {
+            wallet,
+            identity: 'iotFedsAdmin', // not sure about this one
+            // identity: user,
+            discovery: { enabled: true, asLocalhost: true } // using asLocalhost as this gateway is using a fabric network deployed locally
+        });
+        console.log("Connected!!!")
+
+        // Build a network instance based on the channel where the smart contract is deployed
+        const network = await gateway.getNetwork(channelName);
+
+        // Get the contract from the network.
+        const contract = network.getContract(chaincodeName);
+        if (action=='mint'){
+            console.log('\n--> Submit Transaction: Mint, mint tokens');
+            let result = await contract.submitTransaction('Mint', amount);
+            console.log('*** Result: committed', result, '***');
+    
+            console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+        }else if (action=='burn'){
+            console.log('\n--> Submit Transaction: Burn, burn tokens');
+            let result = await contract.submitTransaction('Burn', amount);
+            console.log('*** Result: committed', result, '***');
+    
+            console.log(`*** Result: ${prettyJSONString(result.toString())}`);
+        }else{
+            return res.status(400).send(`Value '${action}' is invalid! Valid values for parameter 'action' are 'mint' or 'burn'.`);
+        }
+        res.status(200).send({message: "OK!"});
+
+    //finally {
+        // Disconnect from the gateway when the application is closing
+        // This will close all connections to the network
+        gateway.disconnect();
+    //}
+
+    }
+
+    catch(error) {
+
+        console.log('Mint/Burn tokens failed with error: '+error);
+
+        res.status(403).send('Mint/Burn tokens failed: '+error)
+
+
+    }
+
+}
+module.exports = mintBurnTokens;

@@ -75,7 +75,7 @@ const removePlatform = async(req, res, next) => {
 				await contract.submitTransaction('RemovePlatform', idPlatform, assocIdUser);
 				console.log('*** Result: committed');
 
-        res.status(200).send("OK!");
+        res.status(200).send({message: "OK!"});
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -93,7 +93,7 @@ const removePlatform = async(req, res, next) => {
 					res.status(404).send('Deletion failed, platform does not exist')
 				}
 				else {
-					res.status(400).send('Deletion failed ...')
+					res.status(400).send({error: 'Deletion failed '+error})
 				}
 
     }

@@ -1,0 +1,2410 @@
+swagger: "2.0"
+info:
+  description: "This is a basic documentation of the Blockchain as a Service (BaaS), platform that will be integrated in ioTFeds by CERTH/ITI. The baasic endpoints for user and federation magement are described here. The documentation will be adjusted and extended as the platform is integrated."
+  version: "1.0.0"
+  title: "On-chain information in IoTFeds"
+# # host: "petstore.swagger.io"
+# # basePath: "/v2"
+tags:
+# # - name: "pet"
+# #   description: "Everything about your Pets"
+# #   externalDocs:
+# #     description: "Find out more"
+# #     url: "http://swagger.io"
+# # - name: "store"
+# #   description: "Access to Petstore orders"
+- name: "user"
+  description: "Operations about user"
+- name: "federation"
+  description: "Operations about federation"
+- name: "voting"
+  description: "Operations about voting"
+# - name: "reputation"
+#   description: "Operations about reputation"
+- name: "product"
+  description: "Operations about product"
+- name: "fed-coins"
+  description: "Operations about fed-coins"
+# - name: "transaction"
+#   description: "Operations about transaction"
+  # externalDocs:
+  #   description: "Find out more about our store"
+  #   url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+
+  /mint_burn_tokens: # seves the buying of products
+    post:
+      tags:
+      - "fed-coins"
+      summary: "Admin user mint or burn fed-coins"
+      description: "Admin user mint or burn fed-coins"
+      operationId: "mint_burn_tokens"
+      produces:
+      - "message"
+      parameters:
+      - type: "object"
+        in: "body"
+        required: true
+        properties:
+          amount:
+            description: "Amount of fed-coins"
+            type: "integer"
+          action: 
+            description: "Mint/burn"
+            type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            $ref: "#/definitions/Fed-coins"
+            example: 
+              {
+                  "message": "OK!"
+              }
+        "400":
+          description: "Mint/burn failed"
+
+  /user_token_balance: # seves the buying of products
+    post:
+      tags:
+      - "fed-coins"
+      summary: "User balance of fed-coins"
+      description: "User balance of fed-coins"
+      operationId: "user_token_balance"
+      produces:
+      - "message"
+      parameters:
+      - type: "object"
+        in: "body"
+        required: true
+        properties:
+          user:
+            description: "User ID"
+            type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            $ref: "#/definitions/Fed-coins"
+            example: 
+              {
+                  iotFedsAdmin balance: 99000 tokens.
+              }
+        "400":
+          description: "User balance operation failed"
+
+  /transfer_tokens: # seves the buying of products
+    post:
+      tags:
+      - "fed-coins"
+      summary: "Transfer fed-coins between users"
+      description: "Transfer fed-coins between users"
+      operationId: "transfer_tokens"
+      produces:
+      - "message"
+      parameters:
+      - type: "object"
+        in: "body"
+        required: true
+        properties:
+          amount:
+            description: "Amount of fed-coins"
+            type: "integer"
+          sender:
+            description: "Sender ID"
+            type: "string"
+          recipient:
+            description: "Recipient ID"
+            type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            $ref: "#/definitions/Fed-coins"
+            example: 
+              {
+                  "message": "OK!"
+              }
+        "400":
+          description: "Transfer operation failed"
+
+  /registerUserToBc: # registration use case
+    post:
+      tags:
+      - "user"
+      summary: "Register user on Blockchain"
+      description: "This is the process of signing up."
+      operationId: "createUser"
+      produces:
+      - "message"
+      parameters:
+      # - in: "body"
+      #   name: "body"
+      #   description: "Created user object"
+      #   required: true
+      #   schema:
+      #     $ref: "#/definitions/User" # update user definition
+      - name: "id"
+        in: "query"
+        description: "The organization's symbiote id"
+        required: true
+        type: "string"
+      - name: "role"
+        in: "query"
+        description: "The operating user's role in the organization"
+        required: true
+        type: "string"
+      - name: "mail"
+        in: "query"
+        description: "The operting user's e-mail adress"
+        required: true
+        type: "string"
+      - name: "organization"
+        in: "query"
+        description: "The organization's name"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful registration"
+        "400":
+          description: "registration failed"
+
+  /registerPlatform: # register platform use case
+    post:
+      tags:
+      - "user"
+      summary: "Associates a platform to related users"
+      description: "Assocaites a platform by updating the equivalent fields in the users. Should be invoked when a new platform is created"
+      operationId: "registerPlatform"
+      produces:
+      - "message"
+      parameters:
+      - name: "platform_id"
+        in: "query"
+        description: "The platform's id"
+        required: true
+        type: "string"
+      - name: "assoc_user_id"
+        in: "query"
+        description: "The user's id"
+        required: true
+        type: "string"
+      # - in: "body"
+      
+      #   name: "body"
+      #   description: "Associated users"
+      #   required: true
+      #   schema:
+      #     "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "update failed"
+          
+  /registerDevice: # register device use case
+    post:
+      tags:
+      - "user"
+      summary: "Registers a device to a user's platform"
+      description: "Registers a device by updating the equivalent field in the user model. SHould be invoked when a user registers a new device"
+      operationId: "registerDevice"
+      produces:
+      - "message"
+      parameters:
+      - name: "device_id"
+        in: "query"
+        description: "The device's id"
+        required: true
+        type: "string"
+      - name: "platform_id"
+        in: "query"
+        description: "The platform in which the device is registered"
+        required: true
+        type: "string"
+      - name: "user"
+        in: "query"
+        description: "The user's id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "update failed"
+ 
+
+  /getUserInfo: # for every user validation step
+    get:
+      tags:
+      - "user"
+      summary: "Information about a user"
+      description: "Returns whether a user exists and relative info"
+      operationId: "getUserInfo"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "query"
+        description: "The user's id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Requested user"
+          schema:
+            $ref: "#/definitions/User" # update user definition
+        "400":
+          description: "access denied"
+          
+  /getAllUsers: # for fed member discovery by admin
+    get:
+      tags:
+      - "user"
+      summary: "Information about all users"
+      description: "Returns all users registered in the Blockchain"
+      operationId: "getAllUsers"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "All users object"
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/definitions/User" # update user definition
+        "400":
+          description: "access denied"
+    
+  /updateUserBalance: # serves payments
+    patch:
+      tags:
+      - "user"
+      summary: "Updates a user's balance"
+      description: "Updates a users balance"
+      operationId: "updateBalance"
+      produces:
+      - "message"
+      parameters:
+      - name: "user_id"
+        in: "query"
+        description: "The user's id"
+        required: true
+        type: "string"
+      - name: "transction_fee"
+        in: "query"
+        description: "The fee to be added/removed from the user's balance"
+        required: true
+        type: "number"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "update failed"    
+          
+          
+ 
+
+
+  /removePlatform:
+    delete:
+      tags:
+      - "user"
+      summary: "Removes a platform from a related user"
+      description: "Removes a platform by updating the equivalent fields in the user. Should be invoked when a platform is deleted. Works even if platform contains devices."
+      operationId: "removePlatform"
+      produces:
+      - "message"
+      parameters:
+      - name: "platform_id"
+        in: "query"
+        description: "The platform's id"
+        required: true
+        type: "string"
+      - name: "assoc_user_id"
+        in: "query"
+        description: "The user's id"
+        required: true
+        type: "string"
+      # - in: "body"
+      
+      #   name: "body"
+      #   description: "Associated users"
+      #   required: true
+      #   schema:
+      #     "string"
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Deletion failed"
+        "404":
+          description: "Deletion failed, platform does not exist"
+
+
+  /removePlatformResources:
+      delete:
+        tags:
+        - "user"
+        summary: "Removes all resources from a platform"
+        description: "Removes all resources from a platform"
+        operationId: "removePlatformresources"
+        produces:
+        - "message"
+        parameters:
+        - name: "platform_id"
+          in: "query"
+          description: "The platform's id"
+          required: true
+          type: "string"
+        responses:
+          "200":
+            description: "successful operation"
+          "400":
+            description: "Deletion failed"
+          "404":
+            description: "Platform resources not found"
+          
+          
+
+  /removeDevice:
+    delete:
+      tags:
+      - "user"
+      summary: "Removes a device from a user's platform"
+      description: "Removes a device by updating the equivalent field in the user model. SHould be invoked when a user deletes a device"
+      operationId: "removeDevice"
+      produces:
+      - "message"
+      parameters:
+      - name: "device_id"
+        in: "query"
+        description: "The device's id"
+        required: true
+        type: "string"
+      - name: "platform_id"
+        in: "query"
+        description: "The platform from the device is deleted"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/User" # show updated user
+        "400":
+          description: "Deletion failed"
+        "404":
+          description: "Deletion failed, device not found in platform"
+          
+          
+          
+  /deleteUser: # only valid under a series of conditions
+    delete:
+      tags:
+      - "user"
+      summary: "Deletes a user"
+      description: "Deletes a user"
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "query"
+        description: "The id of the user to be deleted"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation, user deleted"
+          schema:
+            $ref: "#/definitions/User" # show deleted federation
+        "400":
+          description: "bad request"
+          
+  /registerFedToBc:
+    post:
+      tags:
+      - "federation"
+      summary: "Register federation on Blockchain"
+      description: "This is the process of registering a federation to BC."
+      operationId: "createFederation"
+      produces:
+      - "message"
+      parameters:
+      - name: "fed_id"
+        in: "query"
+        description: "The federations's id"
+        required: true
+        type: "string"
+      - name: "creator_id"
+        in: "query"
+        description: "The creator's id"
+        required: true
+        type: "string"
+      - name: "inf_model"
+        in: "query"
+        description: "The inforamtion model type"
+        required: true
+        type: "string"
+      - name: "role"
+        in: "query"
+        description: "The operating role in the organization"
+        required: true
+        type: "string"
+      - name: "mail"
+        in: "query"
+        description: "The federation's mail"
+        required: true
+        type: "string"
+      - name: "organization"
+        in: "query"
+        description: "The organization's name"
+        required: true
+        type: "string"
+      - name: "related_applications"
+        in: "query"
+        description: "The related vertical applications with the fed"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+      - name: "rules"
+        in: "query"
+        description: "The federation's rules"
+        required: true
+        type: "object"
+      responses:
+        "200":
+          description: "successful registration"
+        "400":
+          description: "registration failed"
+          
+        
+  /getFedInfo: # for every fed validation step
+    get:
+      tags:
+      - "federation"
+      summary: "Validate federation's admin"
+      description: "Returns whether a user exists and relative info"
+      operationId: "getAdminRights"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "fed_id"
+        in: "query"
+        description: "The federations's id"
+        required: true
+        type: "string"
+      - name: "creator_id"
+        in: "query"
+        description: "The creator's id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Federation" # update federation definition
+        "400":
+          description: "bad request"
+          
+  /getAllFeds: # for federation discovery by users
+    get:
+      tags:
+      - "federation"
+      summary: "Information about all federations"
+      description: "Returns all federations registered in the Blockchain"
+      operationId: "getAllFeds"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/definitions/Federation" # update user definition
+        "400":
+          description: "bad request"
+          
+  /leaveFed: # register platform use case
+    patch:
+      tags:
+      - "federation"
+      summary: "Deletes a member from a federation"
+      description: "Deletes a member from a federation if allowed by rules"
+      operationId: "leaveFederation"
+      produces:
+      - "message"
+      parameters:
+      - name: "user_id"
+        in: "query"
+        description: "The user's id"
+        required: true
+        type: "string"
+      - name: "fed_id"
+        in: "query"
+        description: "The federation's id"
+        required: true
+        type: "string"
+      # - in: "body"
+      
+      #   name: "body"
+      #   description: "Associated users"
+      #   required: true
+      #   schema:
+      #     "string"
+      responses:
+        "200":
+          description: "successful operation, member deleted"
+          schema:
+            $ref: "#/definitions/Federation" # show deleted federation
+        "400":
+          description: "bad request"  
+          
+          
+  /deleteFederation: # all member deletion use cases
+    delete:
+      tags:
+      - "federation"
+      summary: "Deletes a federation"
+      description: "Deletes a federation if allowed by rules"
+      operationId: "deleteFederation"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "fed_id"
+        in: "query"
+        description: "The id of the federation to be deleted"
+        required: true
+        type: "string"
+      - name: "creator_id"
+        in: "query"
+        description: "The id of the creator of the federation to be deleted"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation, federation deleted"
+          schema:
+            $ref: "#/definitions/Federation" # show deleted federation
+        "400":
+          description: "bad request"       
+ 
+
+  /addFedMemberRequest: # all member addition use cases
+      post:
+        tags:
+        - "voting"
+        summary: "Requests the addition of a member to a federation"
+        description: "Requests the addition of a member to a federation, a voting procedure is initialized if the proposed member is eligible"
+        operationId: "addMember"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "requestor_id"
+          in: "query"
+          description: "The id of the user that initialized the request"
+          required: true
+          type: "string"
+        - name: "user_id"
+          in: "query"
+          description: "The id of the member to be added"
+          required: true
+          type: "string"
+        - name: "fed_id"
+          in: "query"
+          description: "The id of the federation to add the member to"
+          required: true
+          type: "string"
+        responses:
+          "200":
+            description: "successful request, voting initialized"
+          "400":
+            description: "bad request"
+          
+  /joinFedRequest: # all member addition use cases
+      post:
+        tags:
+        - "voting"
+        summary: "Join as a member to a federation"
+        description: "Join as a member to a federation, a voting procedure is initialized if the proposed member is eligible"
+        operationId: "joinMember"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "user_id"
+          in: "query"
+          description: "The id of the member to be added"
+          required: true
+          type: "string"
+        - name: "fed_id"
+          in: "query"
+          description: "The id of the federation to add the member to"
+          required: true
+          type: "string"
+        responses:
+          "200":
+            description: "successful request, voting initialized"
+          "400":
+            description: "bad request"
+
+  /removeFedMemberRequest: # all member removal use cases
+    post:
+      tags:
+      - "voting"
+      summary: "Requests the removal of a member from a federation"
+      description: "Requests the removal of a member from a federation, a voting procedure is initialized if the proposed member is eligible"
+      operationId: "removeMember"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "requestor_id"
+        in: "query"
+        description: "The id of the user that initialized the request"
+        required: true
+        type: "string"
+      - name: "user_id"
+        in: "query"
+        description: "The id of the member to be removed"
+        required: true
+        type: "string"
+      - name: "fed_id"
+        in: "query"
+        description: "The id of the federation to remove the member from"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful request, voting initialized"
+        "400":
+          description: "bad request"
+          
+  /updateFedRulesRequest: # fed rule update use case
+    post:
+      tags:
+      - "voting"
+      summary: "Requests the update of the rules of a federation"
+      description: "Requests the update of the rules of a federation, a voting procedure is initialized if the rules are eligible"
+      operationId: "changeRules"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "requestor_id"
+        in: "query"
+        description: "The id of the user that initialized the request"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "fed_id"
+        description: "The id of the federation to change rules to"
+        required: true
+        type: "string"
+      - in: body
+        name: new_rules
+        description: The new rules.
+        required: true
+        schema:
+          type: object
+      responses:
+        "200":
+          description: "successful request, voting initialized"
+        "400":
+          description: "bad request"
+          
+
+  /registerVote: # every voting procedure
+      post:
+        tags:
+        - "voting"
+        summary: "Registers a user's vote"
+        description: "Registers a user's vote"
+        operationId: "registerVote"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "token"
+          in: "query"
+          description: "The unique token of the member that is voting"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "vote"
+          description: "The user's vote, should be one of yes/no/abstain"
+          required: true
+          type: "string"
+        responses:
+          "200":
+            description: "successful vote"
+          "400":
+            description: "bad request"
+
+  /getVotingDescription: # for rendering voting page
+    get:
+      tags:
+      - "voting"
+      summary: "Get a voting's description"
+      description: "Exposes a voting's description to be rendered on a page"
+      operationId: "getVotingDescription"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "query"
+        description: "The unique token of the voting member"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              votingType:
+                type: "string"
+              requestorID:
+                type: "string"
+              fedID:
+                type: "string"
+              memberID/proposedRules:
+                type: "string"
+        "400":
+          description: "bad request"
+
+
+  /createProduct: # registration use case
+    post:
+      tags:
+      - "product"
+      summary: "Register product on Blockchain"
+      description: "This is the process of registering a product."
+      operationId: "createProduct"
+      produces:
+      - "message"
+      parameters:
+      # - in: "body"
+      #   name: "body"
+      #   description: "Created user object"
+      #   required: true
+      #   schema:
+      #     $ref: "#/definitions/User" # update user definition
+      - name: "product_id"
+        in: "body"
+        description: "The product's id"
+        required: true
+        type: "string"
+      - name: "resource_ids"
+        in: "body"
+        description: "The product's related resources"
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
+          example: ["str1", "str2", "str3"]
+      - name: "product_details"
+        in: "body"
+        description: "The details of the product"
+        required: true
+        type: "object"
+      - name: "seller_id"
+        in: "body"
+        description: "The seller/creator of the product"
+        required: true
+        type: "string"
+      - name: "fedMarketplace_id"
+        in: "body"
+        description: "The id of the federated marketplace the product resides in"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful registration"
+          schema:
+            $ref: "#/definitions/Product" # update product definition
+        "400":
+          description: "registration failed"
+
+
+  /getProductInfo:
+    get:
+      tags:
+      - "product"
+      summary: "Information about a product"
+      description: "Returns whether a product exists and relative info"
+      operationId: "getProductInfo"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "product_id"
+        in: "query"
+        description: "The products's id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Requested product"
+          schema:
+            $ref: "#/definitions/Product" # update product definition
+        "400":
+          description: "access denied"
+          
+  /getAllProducts:
+    get:
+      tags:
+      - "product"
+      summary: "Information about all products"
+      description: "Returns all products registered in the Blockchain"
+      operationId: "getAllProducts"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "All products object"
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/definitions/Product" # update product definition
+        "400":
+          description: "access denied"
+
+
+  /updateProductPrice: # serves pprice changes
+    patch:
+      tags:
+      - "product"
+      summary: "Updates a product's price"
+      description: "Updates a product's price"
+      operationId: "updatePrice"
+      produces:
+      - "message"
+      parameters:
+      - name: "product_id"
+        in: "query"
+        description: "The product's id"
+        required: true
+        type: "string"
+      - name: "new_price"
+        in: "query"
+        description: "The new price for the product"
+        required: true
+        type: "number"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "update failed"
+
+  /calculateProductPrice: # calculate product's price
+    post:
+      tags:
+      - "product"
+      summary: "The buyer calculates the product price by setting specific parameters"
+      description: "The buyer calculates the product price by setting specific parameters"
+      operationId: "calculateProductPrice"
+      produces:
+      - "message"
+      parameters:
+      - name: "product_id"
+        in: "query"
+        description: "The product's id"
+        required: true
+        type: "string"
+      - name: "user_id"
+        in: "query"
+        description: "The buyer's id"
+        required: true
+        type: "string"
+      - name: "access"
+        in: "query"
+        description: "The number of observations or days the buyer will have access to the product"
+        required: true
+        type: "integer"
+      - name: "streaming"
+        in: "query"
+        description: "Represents if the access will be streaming (time based) or number of observations (times based). True if the access is streaming, False otherwise."
+        required: true
+        type: "bool"
+      - name: "lp"
+        in: "query"
+        description: "The lower threshold for data availability (the lower bound the user is eligible to get data from)"
+        required: true
+        type: "date-time" #E.g., "2023-07-01"
+      - name: "hp"
+        in: "query"
+        description: "The upper threshold for data availability (the upper bound the user is eligible to get data until)"
+        required: true
+        type: "date-time"
+      - name: "fp"
+        in: "query"
+        description: "The frequency that the product gives new values/measurements"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              price:
+                type: number
+        "400":
+          description: "Calculate product price failed"
+
+  /buyProduct: # seves the buying of products
+    post:
+      tags:
+      - "product"
+      summary: "User buys a product and creates the access token in case of successful operation"
+      description: "User buys a product and creates the access token in case of successful operation"
+      operationId: "buyProduct"
+      produces:
+      - "message"
+      parameters:
+      - name: "product_id"
+        in: "body"
+        description: "The product's id"
+        required: true
+        type: "string"
+      - name: "buyer"
+        in: "body"
+        description: "The buyer's id"
+        required: true
+        type: "string"
+      - name: "seller"
+        in: "body"
+        description: "The seller's id"
+        required: true
+        type: "string"
+      - name: "price" 
+        in: "body"
+        description: "The product's price"
+        required: true
+        type: "string"
+      - name: "access"
+        in: "body"
+        description: "The number of observations or days the buyer will have access to the product"
+        required: true
+        type: "integer"
+      - name: "streaming"
+        in: "body"
+        description: "Represents if the access will be streaming (time based) or number of observations (times based). True if the access is streaming, False otherwise."
+        required: true
+        type: "bool"
+      - name: "lp"
+        in: "body"
+        description: "The lower threshold for data availability (the lower bound the user is eligible to get data from)"
+        required: true
+        type: "string" #E.g., "2023-07-01"
+      - name: "hp"
+        in: "body"
+        description: "The upper threshold for data availability (the upper bound the user is eligible to get data until)"
+        required: true
+        type: "string" # E.g., "2023-08-30"
+      - name: "fp"
+        in: "body"
+        description: "The frequency that the product gives new values/measurements"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: object
+            properties:
+              Receipt:
+                schema:
+                type: object
+                $ref: "#/definitions/Receipt"
+              AccessToken:
+                schema:
+                type: object
+                $ref: "#/definitions/AccessToken"
+        "400":
+          description: "Buy product failed"
+
+  /checkAccess: # serves the checking of a user's access to product
+    post: # could be a patch
+      tags:
+      - "product"
+      summary: "When accessing a product, the user's access tokens are checked and either grants him access to the product or not"
+      description: "When accessing a product, the user's access tokens are checked and either grants him access to the product or not"
+      operationId: "chekcAccess"
+      produces:
+      - "message"
+      parameters:
+      - name: "product_id"
+        in: "body"
+        description: "The product's id"
+        required: true
+        type: "string"
+      - name: "user_id" 
+        in: "body"
+        description: "The user's id"
+        required: true
+        type: "string"
+      - name: "data_from"
+        in: "body"
+        description: "the lower bound (timestampA) that the user wants to get data from"
+        required: true
+        type: "string" # e.g., "2023-07-05 or in form that can be translated to a Date object in Node.js"
+      - name: "data_until"
+        in: "body"
+        description: "the upper bound (timestampB) that the user wants to get data until"
+        required: true
+        type: "string" # e.g., "2023-07-10 or in form that can be translated to a Date object in Node.js"
+      - name: "req_observations"
+        in: "body"
+        description: "The number of requested observations"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "The access token for that particular product"
+          schema:
+            type: object
+            $ref: "#/definitions/AccessToken"
+        "403":
+          description: "Product access failed ...You can't have access to product you haven't bought/You no longer have access to this product./Requested data are out of the data bounds you have bought the product for..."
+
+  /decreaseAccess: # used to decrease the available observations
+    post:
+      tags:
+      - "product"
+      summary: "Used to decrease the number of available observations"
+      operationId: "decreaseAccess"
+      produces:
+      - "object"
+      parameters:
+      - name: "product_id"
+        in: "body"
+        description: "The product's id"
+        required: true
+        type: "string"
+      - name: "user_id"
+        in: "body"
+        description: "The user's id"
+        required: true
+        type: "string"
+      - name: "times_used"
+        in: "body"
+        description: "The number of times to decrease"
+        required: true
+        type: "string"
+      responses:
+          "200":
+            description: "The access token for that particular product"
+            schema:
+              type: object
+              $ref: "#/definitions/AccessToken"
+          "403":
+            description: "Object with error"
+            type: object
+            items:
+              properties:
+                error:
+                  type: "string"
+              example:
+                {error: "Decrease access times failed ..."}
+
+  # /getReceipt: # returns the receipt(transaction) information
+  #   get:
+  #     tags:
+  #     - "product"
+  #     summary: "Retrieves the receipt of the purchase"
+  #     description: "Retrieves the receipt of the purchase"
+  #     operationId: "getReceipt"
+  #     produces:
+  #     - "message"
+  #     parameters:
+  #     - name: "tx_id"
+  #       in: "query"
+  #       description: "The transactions's id"
+  #       required: true
+  #       type: "string"
+  #     - name: "user_id" 
+  #       in: "query"
+  #       description: "The user's id"
+  #       required: true
+  #       type: "string"
+  #     responses:
+  #       "200":
+  #         description: "The receipt (object)"
+  #         schema:
+  #           type: object
+  #           items:
+  #             properties:
+  #               Transaction_id:
+  #                 type: "string"
+  #               Buyer:
+  #                 type: "string"
+  #               Seller:
+  #                 type: "string"
+  #               Product_id:
+  #                 type: "string"
+  #               DateBought:
+  #                 type: "string"
+  #           $ref: "#/definitions/Transaction"
+  #       "400":
+  #         description: "Get receipt failed"
+
+  /getUserTokens: # retrieves the access tokens a user owns
+   get:
+    tags:
+    - "product"
+    summary: "retrieves the access tokens a user owns"
+    description: "retrieves the access tokens a user owns"
+    operationId: "getUserTokens"
+    produces:
+    - "message"
+    parameters:
+    - name: "user_id" 
+      in: "body"
+      description: "The user's id"
+      required: true
+      type: "string"
+    responses:
+      "200":
+        description: "User's access tokens"
+        schema:
+          type: object
+          $ref: "#/definitions/Wallet"
+      "400":
+        description: "Get user tokens failed"
+
+
+  /searchProducts: # Serves the distributed searching
+    post:
+      tags:
+      - "product"
+      summary: "searches for products that satisfy a set of criteria"
+      description: "searches for products that satisfy a set of criteria"
+      operationId: "searchProducts"
+      produces:
+      - "message"
+      parameters:
+      - name: "user_id" 
+        in: "body"
+        description: "The user's id"
+        required: true
+        type: "string"
+      - name: "products"
+        in: "body"
+        description: "the products for searching"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+      - name: "price_min" 
+        in: "body"
+        description: "The minimum price to search for"
+        required: true
+        type: "integer"
+      - name: "price_max" 
+        in: "body"
+        description: "The maximum price to search for"
+        required: true
+        type: "integer"
+      - name: "rep_min" 
+        in: "body"
+        description: "The minimum reputation to search for"
+        required: true
+        type: "integer"
+      - name: "rep_max" 
+        in: "body"
+        description: "The maximum reputation to search for"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "Object with array of product id and probability "
+          schema:
+            type: object
+            items:
+              type: array
+              items:
+                product:
+                  type: "object"
+            # example:
+            #   Products: ["product 1", "product2"]
+            $ref: "#/definitions/Product" # update product definition
+        "400":
+          description: "Search for products failed"
+        "404":
+          description: "Search for products failed...No products found"
+
+  /getFederatedProducts: # retrives the products for a federated marketplace
+    get:
+      tags:
+      - "product"
+      summary: "searches for products that in a federated marketplace"
+      description: "searches for products that in a federated marketplace"
+      operationId: "getFederatedProducts"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "query"
+        description: "the user's id"
+        required: true
+        type: "string"
+      - name: "fed_id"
+        in: "query"
+        description: "the fed's id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Products object"
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/definitions/Product" # update product definition
+        "400":
+          description: "Get federated products failed"
+
+  /getGlobalProducts: # retrieves the products for the marketplace
+    get:
+      tags:
+      - "product"
+      summary: "searches for products that inthe global marketplace"
+      description: "searches for products that in the global marketplace"
+      operationId: "getGlobalProducts"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "query"
+        description: "the user's id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Global products object"
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/definitions/Product" # update product definition
+        "400":
+          description: "Get global products failed"
+
+  /getResourceInfo:
+    get:
+      tags:
+      - "resource"
+      summary: "Information about a resource"
+      description: "Returns whether a resource exists and relative info"
+      operationId: "getResourceInfo"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "resource_id"
+        in: "query"
+        description: "The resource's id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Requested resource"
+          schema:
+            $ref: "#/definitions/Resource" # update resource definition
+        "400":
+          description: "access denied"
+          
+  /getAllResources:
+    get:
+      tags:
+      - "resource"
+      summary: "Information about all resources"
+      description: "Returns all resources registered in the Blockchain"
+      operationId: "getAllResources"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "All resources object"
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/definitions/Resource" # update product definition
+        "400":
+          description: "access denied"
+
+  /getFederatedResources:
+    get:
+      tags:
+      - "resource"
+      summary: "Information about fedeation's resources"
+      description: "Returns fedeation's resources registered in the Blockchain"
+      operationId: "getFederatedResources"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "query"
+        description: "The user's id"
+        required: true
+        type: "string"
+      - name: "fed_id"
+        in: "query"
+        description: "The federation's id"
+        required: true
+        type: "string"
+      - name: "Hr"
+        in: "query"
+        description: "Maximum upper time limit that the device is allowed to support"
+        required: true
+        type: "date-time"
+      - name: "Lr"
+        in: "query"
+        description: "Minimum time limit available to support the device"
+        required: true
+        type: "date-time"
+      - name: "Fr"
+        in: "query"
+        description: "The federation's id"
+        required: true
+        type: "number"
+      - name: "price_min"
+        in: "query"
+        description: "The minimum price to search for"
+        required: true
+        type: "number"
+      - name: "price_max"
+        in: "query"
+        description: "The maximum price to search for"
+        required: true
+        type: "number"
+      - name: "rep_min"
+        in: "query"
+        description: "The minimum reputation to search for"
+        required: true
+        type: "number"
+      - name: "rep_max"
+        in: "query"
+        description: "The maximum reputation to search for"
+        required: true
+        type: "number"
+      responses:
+        "200":
+          description: "Federation's resources object"
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: "#/definitions/Resource" # update product definition
+        "400":
+          description: "access denied"
+
+  /searchResources: # Serves the distributed searching for resources
+      post:
+        tags:
+        - "resource"
+        summary: "searches for resources that satisfy a set of criteria"
+        description: "searches for resources that satisfy a set of criteria"
+        operationId: "searchResources"
+        produces:
+        - "message"
+        parameters:
+        - name: "resources"
+          in: "body"
+          description: "the resources to be searched"
+          required: true
+          type: "array"
+          items:
+            type: "string"
+        - name: "price_min" 
+          in: "body"
+          description: "The minimum price to search for"
+          required: true
+          type: "number"
+        - name: "price_max" 
+          in: "body"
+          description: "The maximum price to search for"
+          required: true
+          type: "number"
+        - name: "rep_min" 
+          in: "body"
+          description: "The minimum reputation to search for"
+          required: true
+          type: "number"
+        - name: "rep_max" 
+          in: "body"
+          description: "The maximum reputation to search for"
+          required: true
+          type: "number"
+        - name: "user_id" 
+          in: "body"
+          description: "The user's id"
+          required: true
+          type: "string"
+        responses:
+          "200":
+            description: "Object with array of resources "
+            schema:
+              type: object
+              items:
+                type: array
+                items:
+                  resource:
+                    type: "object"
+              # example:
+              $ref: "#/definitions/Resource"
+          "403":
+            description: "Search for resources failed"
+          "404":
+            description: "No resources found"
+
+  /addResourceToFederation: # serves pprice changes
+    patch:
+      tags:
+      - "resource"
+      summary: "Updates resource's parameters and add resource to federation"
+      description: "Updates resource's parameters and add resource to federation"
+      operationId: "addResourceToFederation"
+      produces:
+      - "message"
+      parameters:
+      - name: "user"
+        in: "query"
+        description: "The user's id"
+        required: true
+        type: "string"
+      - name: "device_id" 
+        in: "query"
+        description: "The device's id"
+        required: true
+        type: "string"
+      - name: "price" 
+        in: "query"
+        description: "The device's price"
+        required: true
+        type: "number"
+      - name: "fed_id"
+        in: "query"
+        description: "The federation to which the device will be added"
+        required: true
+        type: "string"
+      - name: "Lr"
+        in: "query"
+        description: "Minimum time limit available to support the device"
+        required: true
+        type: "date-time"
+      - name: "Hr"
+        in: "query"
+        description: "Maximum upper time limit that the device is allowed to support"
+        required: true
+        type: "date-time"
+      - name: "Fr"
+        in: "query"
+        description: "Maximum measurement frequency, in number of measurements per day, that the technical characteristics of the device can support"
+        required: true
+        type: "number"
+      - name: "Wr"
+        in: "query"
+        description: "Time window which defines the range of historical measurements that a data source can provide (in hours)"
+        required: true
+        type: "number"
+      - name: "aro"
+        in: "query"
+        description: "Weighting factor based on which the discount per use is calculated"
+        required: true
+        type: "number"
+      - name: "ard"
+        in: "query"
+        description: "Weighting factor that determines the slope of the overhead calculation function resulting for product time windows greater than Wr"
+        required: true
+        type: "number"
+      - name: "Brd"
+        in: "query"
+        description: "Maximum overhead that a product will have for time windows that exceed Wr and reach the size of the maximum possible window for the source (Hr - Lr)"
+        required: true
+        type: "number"
+      - name: "fr"
+        in: "query"
+        description: "Maximum predefined frequency limit for which no additional charge will be incurred for a streaming product that includes it"
+        required: true
+        type: "number"
+      - name: "arf"
+        in: "query"
+        description: "Discount factor per use, as the number of uses per product increases"
+        required: true
+        type: "number"
+      - name: "Brr"
+        in: "query"
+        description: "Maximum load factor for frequencies near maximum Fr"
+        required: true
+        type: "number"
+      - name: "arr"
+        in: "query"
+        description: "'Horizontal' discount factor on the base price for streaming products"
+        required: true
+        type: "number"
+      responses:
+        "200":
+          description: "Resource [string] added to federation eketaFED with price [number] FedCoins!"
+        "400":
+          description: "update failed"  
+
+  /rateProduct: # serves pprice changes
+    patch:
+      tags:
+      - "resource"
+      summary: "Updates all product's resources reputations"
+      description: "Updates all product's resources reputation"
+      operationId: "rateProduct"
+      produces:
+      - "message"
+      parameters:
+      - name: "product_id"
+        in: "query"
+        description: "The product's id"
+        required: true
+        type: "string"
+      - name: "user_id" # may not be required
+        in: "query"
+        description: "The user's id"
+        required: true
+        type: "string"
+      # - name: "rating_token" # may not be required
+      #   in: "query"
+      #   description: "The user's rating token"
+      #   required: true
+      #   type: "string"
+      - name: "rating"
+        in: "query"
+        description: "The user's rating"
+        required: true
+        type: "object"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "update failed"  
+
+
+  /updateResourceQos: # serves pprice changes
+    patch:
+      tags:
+      - "resource"
+      summary: "Updates a resource's objective rep. metrics"
+      description: "Updates resource's QoS"
+      operationId: "updateResourceQos"
+      produces:
+      - "message"
+      parameters:
+      - name: "resource_id"
+        in: "query"
+        description: "The resource's id"
+        required: true
+        type: "string"
+      - name: "qos"
+        in: "query"
+        description: "qos metrics, availability, response time, precision"
+        required: true
+        type: "object"
+        properties:
+          availability:
+            type: "string"
+          response_time:
+            type: "string"
+          precision:
+            type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "update failed"  
+
+
+  /updateAllReputations: # updates all reputations in the system
+    patch:
+      tags:
+      - "resource"
+      summary: "Updates all reputations in the system, for each resource contribution"
+      description: "Updates all reputations"
+      operationId: "updateAllReputations"
+      produces:
+      - "message"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "update failed"  
+
+
+
+  /deleteProduct: # only valid under a series of conditions
+    delete:
+      tags:
+      - "product"
+      summary: "Deletes a product"
+      description: "Deletes a product"
+      operationId: "deleteProduct"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "product_id"
+        in: "query"
+        description: "The id of the product to be deleted"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation, product deleted"
+          schema:
+            $ref: "#/definitions/Product" # show deleted federation
+        "400":
+          description: "bad request"
+
+  /unsubscribeProduct: # unsubscribe product
+    post:
+      tags:
+      - "product"
+      summary: "Used to unsubscribe product so can be exchangeable"
+      operationId: "unsubscribeProduct"
+      produces:
+      - "object"
+      parameters:
+      - name: "product_id"
+        in: "body"
+        description: "The product's id"
+        required: true
+        type: "string"
+      - name: "user_id"
+        in: "body"
+        description: "The user's id"
+        required: true
+        type: "string"
+      responses:
+          "200":
+            description: "The unsubscribed access token"
+            schema:
+              type: object
+              $ref: "#/definitions/AccessToken"
+          "403":
+            description: "Object with error"
+            type: object
+            items:
+              properties:
+                error:
+                  type: "string"
+              example:
+                {error: "Unsubscribe procedure failed ..."}
+
+  /getAllExchangableTokens: # retrieves all exchangable tokens
+   get:
+    tags:
+    - "AccessToken"
+    summary: "retrieves all exchangable tokens"
+    description: "retrieves all exchangable tokens"
+    operationId: "getAllExchangableTokens"
+    produces:
+    - "message"
+    responses:
+      "200":
+        description: "All exchangable tokens"
+        schema:
+          type: object
+          $ref: "#/definitions/Exchange"
+      "400":
+        description: "Get exchangable tokens failed"
+
+  /putTokenForExchange: # token exchange use case
+      patch:
+        tags:
+        - "AccessToken"
+        summary: "Makes a token available for exchange"
+        description: "Makes a token available for exchange and returns relative info"
+        operationId: "putTokenForExchange"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "requestor_id"
+          in: "query"
+          description: "The id of the user that initialized the request"
+          required: true
+          type: "string"
+        - name: "product_id"
+          in: "query"
+          description: "The id of the product the user wants to exchange"
+          required: true
+          type: "string"
+        responses:
+          "200":
+            description: "successful request, token available for exchange"
+            schema:
+              $ref: "#/definitions/AccessToken" # show exchangable token
+          "400":
+            description: "bad request"
+          
+
+  /removeTokenFromExchange: # token exchange use case
+      patch:
+        tags:
+        - "AccessToken"
+        summary: "Makes a token unavailable for exchange"
+        description: "Makes a token unavailable for exchange and returns relative info"
+        operationId: "removeTokenFromExchange"
+        produces:
+        - "application/json"
+        parameters:
+        - name: "requestor_id"
+          in: "query"
+          description: "The id of the user that initialized the request"
+          required: true
+          type: "string"
+        - name: "product_id"
+          in: "query"
+          description: "The id of the product the user wants to make unavailable for exchange"
+          required: true
+          type: "string"
+        responses:
+          "200":
+            description: "successful request, token not available for exchange anymore"
+            schema:
+              $ref: "#/definitions/AccessToken" # show removed token
+          "400":
+            description: "bad request"
+          
+  /exchangeTokens: # token exchange use case
+    patch:
+      tags:
+      - "AccessToken"
+      summary: "Exchanges two tokens between users"
+      description: "Exchanges two tokens between users"
+      operationId: "exchangeTokens"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user1"
+        in: "query"
+        description: "The id of the user whose token was made available for exchange"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "user2"
+        description: "The id of the user that proposed the exchange"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "product1"
+        description: "The product that was made availble for exchange by user1"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "product2"
+        description: "The product that was proposed for exchange by user2"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful request, exchange complete"
+        "400":
+          description: "bad request"
+          
+  /retrieveReceiptsSeller:
+    post:
+      tags:
+      - "Receipt"
+      summary: "Retrieves the transactions' receipts where user is the seller"
+      description: "Retrieves the transactions' receipts where user is the seller"
+      operationid: "retrieveReceiptsSeller"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user"
+        in: "body"
+        description: "The seller calling this function"
+        required: true
+        type: "string"
+      - name: "product_id"
+        in : "body"
+        description: "The product to see the receipts for"
+        required: false
+        type: "string"
+      - name: "fromDate"
+        in: "body"
+        description: "The date from which onward seller wants to see the receipts"
+        required: false
+        type: "string" # can be in the form "2023-05-17" or "2023-05-17T13:09:01.000Z"
+      - name: "toDate"
+        in: "body"
+        description: "The date up to which  seller wants to see the receipts"
+        required: false
+        type: "string" # can be in the form "2023-05-17" or "2023-05-17T13:09:01.000Z"
+      responses:
+        "200":
+          description: "Object with array of receipts "
+          schema:
+            type: object
+            items:
+              type: array
+              items:
+                receipt:
+                  type: "object"
+                  $ref: "#/definitions/Receipt"
+            example: {"Receipts": [
+              {
+              "TransactionID":"8ce5ece422cf83aadfcf4fdb505d62376ce0bfb18d66db899e4df872e51ab33c",
+              "Buyer": "evathana",
+              "Seller": "spolymeni",
+              "ProductID": "product3",
+              "DateBought": "2023-05-17T13:09:01.000Z"
+              }, 
+              {
+              "TransactionID": "eabb26b7d54ff3aa953aa4e4dbe35a794867f2bd259807e1260812acd6648c25",
+              "Buyer": "gspanos",
+              "Seller": "spolymeni",
+              "ProductID": "product3",
+              "DateBought": "2023-05-17T13:37:49.000Z"}]}
+        "400":
+          description: "Retrieve receipts operation failed ...Malformed request"
+        "500":
+          description: "Retrieve receipts operation failed ..."
+
+  /retrieveReceiptsBuyer:
+    post:
+      tags:
+      - "Receipt"
+      summary: "Retrieves the transactions' receipts where user is the buyer"
+      description: "Retrieves the transactions' receipts where user is the buyer"
+      operationid: "retrieveReceiptsBuyer"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user"
+        in: "body"
+        description: "The buyer calling this function"
+        required: true
+        type: "string"
+      - name: "product_id"
+        in : "body"
+        description: "The product to see the receipts for"
+        required: false
+        type: "string"
+      - name: "fromDate"
+        in: "body"
+        description: "The date from which onward buyer wants to see the receipts"
+        required: false
+        type: "string" # can be in the form "2023-05-17" or "2023-05-17T13:09:01.000Z"
+      - name: "toDate"
+        in: "body"
+        description: "The date up to which  buyer wants to see the receipts"
+        required: false
+        type: "string" # can be in the form "2023-05-17" or "2023-05-17T13:09:01.000Z"
+      responses:
+        "200":
+          description: "Object with array of receipts "
+          schema:
+            type: object
+            items:
+              type: array
+              items:
+                receipt:
+                  type: "object"
+                  $ref: "#/definitions/Receipt"
+            example: {"Receipts": [
+              {
+              "TransactionID":"8ce5ece422cf83aadfcf4fdb505d62376ce0bfb18d66db899e4df872e51ab33c",
+              "Buyer": "evathana",
+              "Seller": "spolymeni",
+              "ProductID": "product3",
+              "DateBought": "2023-05-17T13:09:01.000Z"
+              }, 
+              {
+              "TransactionID": "eabb26b7d54ff3aa953aa4e4dbe35a794867f2bd259807e1260812acd6648c25",
+              "Buyer": "gspanos",
+              "Seller": "spolymeni",
+              "ProductID": "product3",
+              "DateBought": "2023-05-17T13:37:49.000Z"}]}
+        "400":
+          description: "Retrieve receipts operation failed ...Malformed request"
+        "500":
+          description: "Retrieve receipts operation failed ..."
+
+
+  /verifyReceipt:
+    post:
+      tags:
+      - "Receipt"
+      summary: "Used for verifying the integrity of a receipt"
+      description: "Used for verifying the integrity of a receipt"
+      operationId: "verifyReceipt"
+      produces: 
+      - "application/json"
+      parameters:
+      - name: "receipt"
+        in: "body"
+        description: "The object of the receipt to be verified"
+        required: true
+        schema:
+          type: "object"
+          $ref: "#/definitions/Receipt"
+      - name: "user_id"
+        in: "body"
+        description: "The user that calls this action"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Object with a boolean value stating if the verification was successful"
+          schema:
+            type: object
+            items:
+              Verified:
+                type: "boolean"
+            example:
+              {
+                "Verified": true
+                }
+        "400":
+          description: "Verify receipt operation failed ...Malformed receipt..."
+        "500":
+          description: "Verify receipt operation failed ..."
+
+
+  /retrieveAccessLogs:
+    post:
+      tags: 
+      - "Log"
+      summary: "The admin can retrieve the logs based on the usage/access of the products"
+      description: "The admin can retrieve the logs based on the usage/access of the products"
+      operationId: "retrieveAccessLogs"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user"
+        in: "body"
+        description: "The user for whom this function is called"
+        required: false
+        type: "string"
+      - name: "product_id"
+        in : "body"
+        description: "The product to see the receipts for"
+        required: false
+        type: "string"
+      - name: "fromDate"
+        in: "body"
+        description: "The date from which onward admin wants to see the receipts"
+        required: false
+        type: "string" # can be in the form "2023-05-17" or "2023-05-17T13:09:01.000Z"
+      - name: "toDate"
+        in: "body"
+        description: "The date up to which admin wants to see the receipts"
+        required: false
+        type: "string" # can be in the form "2023-05-17" or "2023-05-17T13:09:01.000Z" or empty ""
+      responses:
+        "200":
+          description: "Object with array of logs "
+          schema:
+            type: object
+            items:
+              type: array
+              items:
+                receipt:
+                  type: "object"
+                  $ref: "#/definitions/Log"
+            example:
+              {"Logs":[
+              {
+              "TransactionID": "62d5586b78df064bcdf2b9332230b07a80d8cf48c23dc60d02dfa9033a25645c",
+              "User": "evathana",
+              "ProductID": "product3",
+              "DateAccessed": "2023-05-23T10:41:53.973Z"
+              },
+              {
+              "TransactionID": "8b9ee0283155a542c498a5b4bcfdc40114228aaf431825d3bdf434cfe29108a8",
+              "User": "evathana",
+              "ProductID": "product2",
+              "DateAccessed": "2023-05-23T10:42:15.765Z"}]}
+        "400":
+          description: "Retrieve logs operation failed ...Malformed request"
+        "500":
+          description: "Retrieve logs operation failed ..."
+
+  /verifyAccessLog:
+    post:
+      tags:
+      - "Log"
+      summary: "Used for verifying the integrity of a receipt"
+      description: "Used for verifying the integrity of a receipt"
+      operationId: "verifyReceipt"
+      produces: 
+      - "application/json"
+      parameters:
+      - name: "receipt"
+        in: "body"
+        description: "The object of the receipt to be verified"
+        required: true
+        schema:
+          type: "object"
+          $ref: "#/definitions/Log"
+      - name: "user_id"
+        in: "body"
+        description: "The user that calls this action"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Object with a boolean value stating if the verification was successful"
+          schema:
+            type: object
+            items:
+              Verified:
+                type: "boolean"
+            example:
+              {
+                "Verified": true
+                }
+        "400":
+          description: "Verify access log operation failed ...Malformed access log..."
+        "500":
+          description: "Verify access log operation failed ..."
+
+
+
+definitions:
+
+  Fed-coins:
+    type: "object"
+    properties:
+      amount:
+        type: "integer"
+      action:
+        type: "string"
+      user:
+        type: "string"
+      sender:
+        type: "string"
+      recipient:
+        type: "string"
+    xml:
+      name: "Fed-coins"
+
+  User:
+    type: "object"
+    properties:
+      ID:
+        type: "string"
+      role:
+        type: "string"
+      mail:
+        type: "string"
+      organization:
+        type: "string"
+      balance:
+        type: "number"
+      # associated_resources:
+      #   type: "array"
+      #   items:
+      #     type: "string"
+      Fed_owner:
+        type: "boolean"
+      Feds:
+        type: array
+        items:
+          type: string
+        example: ["federation1", "federation2"]        
+      ActiveProducts:
+        type: array
+        items:
+          type: string
+        example: ["product1", "product2"]
+      AssociatedPlatforms:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+              type: "string"
+        example:
+          platfrom1: ["resource1", "resource2", "resource3"]
+          platfrom2: ["resource1", "resource2", "resource3"]
+    xml:
+      name: "User"
+      
+  Federation:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      balance:
+        type: "number"
+      creator_id:
+        type: "string"
+      inf_model:
+        type: "string"
+      member_ids:
+        type: "array"
+        items:
+          type: "string"
+      related_applications:
+        type: "array"
+        items:
+          type: "string"
+      rules:
+        type: "object"
+    xml:
+      name: "Federation"
+      
+  Voting:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      fed_id:
+        type: "string"
+      start_time:
+        type: "number"
+      end_time:
+        type: "number"
+      descr:
+        type: "object"
+        properties:
+          votingType:
+            type: "string"
+          requestorID:
+            type: "string"
+          fedID:
+            type: "string"
+          memberID/proposedRules:
+            type: "string"
+      status: 
+        type: boolean # 1 = ongoing , 0 = complete
+      votes: # all eligible voters are initialized with pending
+        type: "object"
+        example:
+            user1: "yes"
+            user2: "pending"
+            user3: "abstain"
+            user4: "pending"
+            user5: "no"
+    xml:
+      name: "Voting"
+      
+  
+  Resource:
+    type: "object"
+    properties:
+      Resource_id:
+        type: "string"
+      Platform:
+        type: "string"
+      Price:
+        type: "number"
+      subj_reputation:
+        type: "number"
+      overall_reputation:
+        type: "number"
+      platform:
+        type: "string"
+      docType:
+        type: "string"
+      owner:
+        type: "string"
+      federations:
+        items:
+          type: "string"
+      obj_reputation:
+        type: "number"
+      transactionCounter:
+        type: "number"
+      Brd:
+        type: "number"
+      Brr:
+        type: "number"
+      Fr:
+        type: "number"
+      Hr:
+        type: "number"
+      Lr:
+        type: "number"
+      Wr:
+        type: "number"
+      ard:
+        type: "number"
+      arf:
+        type: "number"
+      aro:
+        type: "number"
+      arr:
+        type: "number"
+    xml:
+      name: "Resource"
+      
+  Product:
+    type: "object"
+    properties:
+      Product_id:
+        type: "string"
+      docType:
+        type: "string"
+      Seller:
+        type: "string"
+      FedMarketplace_id:
+        type: "string"
+      GlobalMarketplace:
+        type: "boolean"
+      Price:
+        type: "number"
+      subjReputation:
+        type: "array"
+        items:
+          type: "number"
+      Reputation:
+        type: "number"
+      Resource_ids:
+        type: "object"
+        items:
+          type: "string"
+      transactionCounter:
+        type: "number"
+      product_details:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            product_type:
+              type: "string"
+            total_volume_mb:
+              type: "number"
+    xml:
+      name: "Product"
+        
+      
+  Receipt:
+      type: "object"
+      properties:
+        TransactionID:
+          type: "string"
+        ProductID:
+          type: "string"
+        Seller:
+          type: "string"
+        Buyer:
+          type: "string"
+        DateBought:
+          type: "string"
+      xml:
+        name: "Receipt"
+
+  Log:
+    type: "object"
+    properties:
+      TransactionID:
+          type: "string"
+      ProductID:
+        type: "string"
+      User:
+        type: "string"
+      DateAccessed:
+        type: "string"
+
+  AccessToken:
+    type: "object"
+    properties:
+      product_id:
+        type: "object"
+        properties:
+          AccessTimes: 
+            type: "string"
+          AccessPeriod:
+            type: "string"
+          userHasRated:
+            type: "boolean"
+          toBeExchanged:
+            type: "boolean"
+          inUse:
+            type: "boolean"
+          DataAvailableFrom:
+            type: string #e.g., "2023-07-01T00:00:00.000Z"
+          DataAvailableUntil:
+            type: string #e.g., "2023-07-10T00:00:00.000Z"
+          Marketplace:
+            type: string
+          ValidUntil:
+            type: string  # e.g., "2023-08-27T12:34:26.136Z"
+          Frequency:
+            type: string
+    example:
+      product 1: {AccessTimes: "2", userHasRated: false, toBeExchanged: false, inUse: false, DataAvailableFrom: "2023-07-01T00:00:00.000Z", DataAvailableUnti: "2023-07-10T00:00:00.000Z", Marketplace: "IoTFeds", ValidUntil: "2023-08-10T00:00:00.000Z", Frequency: ""}
+    xml:
+      name: "AccessToken"
+
+
+  Wallet:
+    type: "object"
+    properties:
+      user_id:
+        type: "object"
+        properties:
+          product_id:
+            type: "object"
+            properties:
+              AccessTimes: 
+                type: "string"
+              AccessPeriod:
+                type: "string"
+              userHasRated:
+                type: "boolean"
+              toBeExchanged:
+                type: "boolean"
+              DataAvailableFrom:
+                type: "string"
+              DataAvailableUntil:
+                type: "string"
+              Marketplace:
+                type: "string"
+              Frequency:
+                type: "string"        
+    example:
+      {product 1: {AccessTimes: "2", userHasRated: false, toBeExchanged: false, DataAvailableFrom: "2023-07-01T00:00:00.000Z", DataAvailableUntil: "2023-07-10T00:00:00.000Z", Marketplace: "IotFeds", ValidUntil: "2023-08-10T00:00:00.000Z", Frequency: ""}, product 2: {AccessPeriod: "2023-07-10T00:00:00.000Z", userHasRated: true, toBeExchanged: false, DataAvailableFrom: "2023-07-01T00:00:00.000Z", DataAvailableUntil: "2023-08-10T00:00:00.000Z", Marketplace: "IotFeds", Frequency: "20"}}
+    xml:
+      name: "Wallet"
+
+  Exchange:
+    type: "object"
+    properties:
+      allExchangableTokens:
+        type: "object"
+        properties:
+          user_id:
+            type: "object"
+            properties:
+              AccessTimes: 
+                type: "string"
+              userHasRated:
+                type: "boolean"
+              toBeExchanged:
+                type: "boolean"
+              DataAvailableFrom:
+                type: "date-time"
+              DataAvailableUntil:
+                type: "date-time"
+              Marketplace:
+                type: "string"
+              ValidUntil:
+                type: "date-time"
+              inUse:
+                type: "boolean"
+              Frequency:
+                type: "string"
+              productID:
+                type: "string"        
+    example:
+      {allExchangableTokens: [{user1: [{AccessTimes: "2", userHasRated: false, toBeExchanged: false, DataAvailableFrom: "2023-07-01T00:00:00.000Z", DataAvailableUnti: "2023-07-10T00:00:00.000Z", Marketplace: "IotFeds", ValidUntil: "2023-08-10T00:00:00.000Z", Frequency: ""}]}]}
+    xml:
+      name: "Exchange"
+
+
+  

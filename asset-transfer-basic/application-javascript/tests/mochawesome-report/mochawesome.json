@@ -1,0 +1,233 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 7,
+    "passes": 7,
+    "pending": 0,
+    "failures": 0,
+    "start": "2023-08-28T12:39:38.777Z",
+    "end": "2023-08-28T12:39:43.924Z",
+    "duration": 5147,
+    "testsRegistered": 7,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "1c31bab2-2706-4713-9784-06c9bbb36e39",
+      "title": "",
+      "fullFile": "",
+      "file": "",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "48673bda-de20-4cd5-b0e2-89e8582d39e2",
+          "title": "Restful BaaS API tests",
+          "fullFile": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTestUser.js",
+          "file": "/test/BaasTestUser.js",
+          "beforeHooks": [
+            {
+              "title": "\"before all\" hook in \"Restful BaaS API tests\"",
+              "fullTitle": "Restful BaaS API tests \"before all\" hook in \"Restful BaaS API tests\"",
+              "timedOut": false,
+              "duration": 0,
+              "state": null,
+              "speed": null,
+              "pass": false,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "this.timeout(10000); // Set a timeout of 5 seconds for all tests",
+              "err": {},
+              "uuid": "995d10b9-32b9-4115-86e7-5492fec4cbd1",
+              "parentUUID": "48673bda-de20-4cd5-b0e2-89e8582d39e2",
+              "isHook": true,
+              "skipped": false
+            }
+          ],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "should successfully register a user",
+              "fullTitle": "Restful BaaS API tests should successfully register a user",
+              "timedOut": false,
+              "duration": 1616,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "request(baseurl)\n    .post('/user/register_user')\n    .send(userRegister)\n    .set('Accept', 'application/json')\n    .set('Content-Type', 'application/json')\n    .end(function(err, res) {\n        expect(res.statusCode).to.be.equal(200);\n        if (err) {\n            throw err;\n        }\n        done();\n    });",
+              "err": {},
+              "uuid": "5184d087-b2a1-4328-a205-17ace89520f1",
+              "parentUUID": "48673bda-de20-4cd5-b0e2-89e8582d39e2",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should fetch ththis.timeout(5000); // Set a timeout of 5 secondse user with the provided id",
+              "fullTitle": "Restful BaaS API tests should fetch ththis.timeout(5000); // Set a timeout of 5 secondse user with the provided id",
+              "timedOut": false,
+              "duration": 147,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "request(baseurl)\n    .get('/user/get_user_info')\n    .query({user_id: userRegister.id})\n    .set('Accept', 'application/json')\n    .set('Content-Type', 'application/json')\n    .end(function(err, res) {\n        expect(res.statusCode).to.be.equal(200);\n        expect(res.body.ID).to.be.equal(userRegister.id);\n        expect(res.body.Role).to.be.equal(userRegister.role);\n        expect(res.body.Mail).to.be.equal(userRegister.mail);\n        expect(res.body.Organization).to.be.equal(userRegister.organization);\n        if (err) {\n            throw err;\n        }\n        done();\n    });",
+              "err": {},
+              "uuid": "45aa0209-46c0-41a8-a099-789dd24a28f9",
+              "parentUUID": "48673bda-de20-4cd5-b0e2-89e8582d39e2",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should Delete the user with the provided id",
+              "fullTitle": "Restful BaaS API tests should Delete the user with the provided id",
+              "timedOut": false,
+              "duration": 532,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "request(baseurl)\n    .delete('/user/delete_user')\n    .send({user_id: userRegister.id})\n    .set('Accept', 'application/json')\n    .set('Content-Type', 'application/json')\n    // .set('Cookie', 'token=' + token)\n    .end(function(err, res) {\n        expect(res.statusCode).to.be.equal(200);\n        expect(res.body.ID).to.be.equal(userRegister.id);\n        expect(res.body.Role).to.be.equal(userRegister.role);\n        expect(res.body.Mail).to.be.equal(userRegister.mail);\n        expect(res.body.Organization).to.be.equal(userRegister.organization);\n        if (err) {\n            throw err;\n        }\n        done();\n    });",
+              "err": {},
+              "uuid": "398301ce-ae18-4d78-afa4-d21ca537fcf3",
+              "parentUUID": "48673bda-de20-4cd5-b0e2-89e8582d39e2",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should show 403 status code for deleted user",
+              "fullTitle": "Restful BaaS API tests should show 403 status code for deleted user",
+              "timedOut": false,
+              "duration": 153,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "request(baseurl)\n    .get('/user/get_user_info')\n    .query({user_id: userRegister.id})\n    .set('Accept', 'application/json')\n    .set('Content-Type', 'application/json')\n    .end(function(err, res) {\n        expect(res.statusCode).to.be.equal(403);\n        if (err) {\n            throw err;\n        }\n        done();\n    });",
+              "err": {},
+              "uuid": "6bb3b8dc-12b7-4ef5-a9ff-ef56600f7b33",
+              "parentUUID": "48673bda-de20-4cd5-b0e2-89e8582d39e2",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should successfully register a user",
+              "fullTitle": "Restful BaaS API tests should successfully register a user",
+              "timedOut": false,
+              "duration": 1518,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "request(baseurl)\n    .post('/user/register_user')\n    .send(userRegister)\n    .set('Accept', 'application/json')\n    .set('Content-Type', 'application/json')\n    .end(function(err, res) {\n        expect(res.statusCode).to.be.equal(200);\n        if (err) {\n            throw err;\n        }\n        done();\n    });",
+              "err": {},
+              "uuid": "60f1fc27-c862-4102-9d9b-5fb76c906716",
+              "parentUUID": "48673bda-de20-4cd5-b0e2-89e8582d39e2",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should update the balance of the provided user id by adding the transactionFee",
+              "fullTitle": "Restful BaaS API tests should update the balance of the provided user id by adding the transactionFee",
+              "timedOut": false,
+              "duration": 566,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "var idTransaction = userRegister.id;\nvar transactionFee = 300;\nrequest(baseurl)\n    .patch('/user/update_user_balance')\n    .send({ id: idTransaction, transaction_fee: transactionFee })\n    .set('Accept', 'application/json')\n    .set('Content-Type', 'application/json')\n    // .set('Cookie', 'token=' + token)\n    .end(function(err, res) {\n        expect(res.statusCode).to.be.equal(200);\n        if (err) {\n            throw err;\n        }\n        done();\n    });",
+              "err": {},
+              "uuid": "1965c13d-3423-4c49-861f-af3e1c1e9f72",
+              "parentUUID": "48673bda-de20-4cd5-b0e2-89e8582d39e2",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "should Delete the user with the provided id",
+              "fullTitle": "Restful BaaS API tests should Delete the user with the provided id",
+              "timedOut": false,
+              "duration": 596,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "request(baseurl)\n    .delete('/user/delete_user')\n    .send({user_id: userRegister.id})\n    .set('Accept', 'application/json')\n    .set('Content-Type', 'application/json')\n    // .set('Cookie', 'token=' + token)\n    .end(function(err, res) {\n        expect(res.statusCode).to.be.equal(200);\n        expect(res.body.ID).to.be.equal(userRegister.id);\n        expect(res.body.Role).to.be.equal(userRegister.role);\n        expect(res.body.Mail).to.be.equal(userRegister.mail);\n        expect(res.body.Organization).to.be.equal(userRegister.organization);\n        if (err) {\n            throw err;\n        }\n        done();\n    });",
+              "err": {},
+              "uuid": "e00f0b94-fd65-429b-82a7-3685668f2357",
+              "parentUUID": "48673bda-de20-4cd5-b0e2-89e8582d39e2",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "5184d087-b2a1-4328-a205-17ace89520f1",
+            "45aa0209-46c0-41a8-a099-789dd24a28f9",
+            "398301ce-ae18-4d78-afa4-d21ca537fcf3",
+            "6bb3b8dc-12b7-4ef5-a9ff-ef56600f7b33",
+            "60f1fc27-c862-4102-9d9b-5fb76c906716",
+            "1965c13d-3423-4c49-861f-af3e1c1e9f72",
+            "e00f0b94-fd65-429b-82a7-3685668f2357"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 5128,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "8.4.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.0.1"
+    },
+    "marge": {
+      "options": null,
+      "version": "6.0.1"
+    }
+  }
+}

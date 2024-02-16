@@ -41,18 +41,11 @@ const GetVotingDescription = async(req, res, next) => {
 	    return res.status(401).send('Access token required');
 	  }
 
-	  jwt.verify(token, process.env.TOKEN_SECRET.toString(), (err, decoded) => {
-	    console.log(err);
-
-	    if (err) {
-				return res.status(403).send('Invalid token');
-			}
-			voting_id = decoded.IDvoting;
-			voter_id = decoded.IDvoter;
-
-		});
-
     try {
+            let decoded=jwt.verify(token, process.env.TOKEN_SECRET.toString())
+            voting_id = decoded.IDvoting;
+			voter_id = decoded.IDvoter;
+        
 
 			const ccp = buildCCPOrg1();
 
@@ -105,13 +98,14 @@ const GetVotingDescription = async(req, res, next) => {
         gateway.disconnect();
     //}
 
+
     }
 
     catch(error) {
 
         console.log('Voting description access failed with error: '+error);
 
-        res.status(400).send('Access failed ...')
+        res.status(400).send('Access failed: '+error)
 
 
     }

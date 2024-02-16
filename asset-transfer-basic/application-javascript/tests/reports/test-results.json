@@ -1,0 +1,126 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 6,
+    "passes": 6,
+    "pending": 0,
+    "failures": 0,
+    "start": "2023-08-25T12:34:55.416Z",
+    "end": "2023-08-25T12:34:59.667Z",
+    "duration": 4251
+  },
+  "tests": [
+    {
+      "title": "should successfully create a booking",
+      "fullTitle": "Restful Booker API Tests should successfully create a booking",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 591,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should fetch the booking of the provided booking id",
+      "fullTitle": "Restful Booker API Tests should fetch the booking of the provided booking id",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 590,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should update the booking of the provided booking id using Put request",
+      "fullTitle": "Restful Booker API Tests should update the booking of the provided booking id using Put request",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 590,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should update the firstname and lastname of booking of the provided booking id",
+      "fullTitle": "Restful Booker API Tests should update the firstname and lastname of booking of the provided booking id",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 591,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should Delete the booking of the provided booking id",
+      "fullTitle": "Restful Booker API Tests should Delete the booking of the provided booking id",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 592,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should show 404 status code for deleted booking id",
+      "fullTitle": "Restful Booker API Tests should show 404 status code for deleted booking id",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 588,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [],
+  "passes": [
+    {
+      "title": "should successfully create a booking",
+      "fullTitle": "Restful Booker API Tests should successfully create a booking",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 591,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should fetch the booking of the provided booking id",
+      "fullTitle": "Restful Booker API Tests should fetch the booking of the provided booking id",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 590,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should update the booking of the provided booking id using Put request",
+      "fullTitle": "Restful Booker API Tests should update the booking of the provided booking id using Put request",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 590,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should update the firstname and lastname of booking of the provided booking id",
+      "fullTitle": "Restful Booker API Tests should update the firstname and lastname of booking of the provided booking id",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 591,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should Delete the booking of the provided booking id",
+      "fullTitle": "Restful Booker API Tests should Delete the booking of the provided booking id",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 592,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    },
+    {
+      "title": "should show 404 status code for deleted booking id",
+      "fullTitle": "Restful Booker API Tests should show 404 status code for deleted booking id",
+      "file": "/home/vaggelis/Public/baas/asset-transfer-basic/application-javascript/tests/test/BaasTest.js",
+      "duration": 588,
+      "currentRetry": 0,
+      "speed": "slow",
+      "err": {}
+    }
+  ]
+}

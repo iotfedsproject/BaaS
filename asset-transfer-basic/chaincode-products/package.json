@@ -1,0 +1,23 @@
+{
+    "name": "products",
+    "version": "1.0.0",
+    "description": "Chaincode that is responsible for managing the products and the transactions of the marketplece of IoT-Feds",
+    "main": "index.js",
+    "engines": {
+        "node": ">=12",
+        "npm": ">=5"
+    },
+    "scripts": {
+        "start": "fabric-chaincode-node start"
+    },
+    "engineStrict": true,
+    "author": "Hyperledger",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "fabric-contract-api": "^2.0.0",
+        "fabric-shim": "^2.0.0",
+        "json-stringify-deterministic": "^1.0.1",
+        "sort-keys-recursive": "^2.0.0",
+        "timers-promises": "^1.0.1"
+    }
+}

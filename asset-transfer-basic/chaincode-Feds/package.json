@@ -18,6 +18,7 @@
         "fabric-shim": "^2.0.0",
         "json-stringify-deterministic": "^1.0.1",
         "sort-keys-recursive": "^2.0.0",
-        "timers-promises": "^1.0.1"
+        "timers-promises": "^1.0.1",
+        "axios": "1.5.0"
     }
 }

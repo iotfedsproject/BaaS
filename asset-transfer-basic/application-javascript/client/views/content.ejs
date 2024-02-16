@@ -14,8 +14,8 @@
     <p id="voting_descr">  Removal of user <%= descr['memberID']  %> from federation <%= descr['fedID']  %> requested by user <%= descr['requestorID']  %> </p>
   <% }
   if (descr['votingType'] === "rule change") { %>
-    <p id="voting_descr">  Change of rules to federation <%= descr['fedID']  %> requested by user <%= descr['requestorID'] %>. Proposed change at at <%= descr['proposedRules']['changedField']%></p><br>
-    <p id="rule_set"> where current value is "<%= descr['proposedRules']['current'] %>" and proposed is  "<%= descr['proposedRules']['proposed'] %>" </p>
+    <p id="voting_descr">  Change of rules to federation <%= descr['fedID']  %> requested by user <%= descr['requestorID'] %>. Proposed change at <%= descr['proposedRules']['changedField']%></p><br>
+    <p id="rule_set"> where current value is: <%= JSON.stringify(descr['proposedRules']['current']) %> and proposed is:  <%= JSON.stringify(descr['proposedRules']['proposed']) %> </p>
   <% } %>
 
   <br>

@@ -144,7 +144,7 @@ const updateFedRulesRequest = async(req, res, next) => {
 
         console.log('Request to update federation rules failed with error: '+error);
 
-        res.status(400).send('Request to update federation rules failed ...')
+        res.status(400).send({error: 'Request to update federation rules failed: '+error})
 
 
     }

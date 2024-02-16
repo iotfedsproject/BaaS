@@ -1,6 +1,7 @@
 const { Gateway, Wallets} = require('fabric-network');
 const path = require('path');
 const fs = require('fs');
+const url = require('url');
 // const insertlog = require('../../MongoDB/controllers/insertlog');
 
 const FabricCAServices = require('fabric-ca-client');
@@ -9,6 +10,7 @@ const { buildCCPOrg1, buildWallet } = require('../../../../test-application/java
 
 const channelName = 'mychannel';
 const chaincodeName = 'basic';
+//const chaincodeName2 = 'token_erc20';
 const mspOrg1 = 'iotfedsMSP';
 
 
@@ -29,7 +31,9 @@ function prettyJSONString(inputString) {
 const getUserInfo = async(req, res, next) => {
 
     //should be given by request or taken from a token (e.g. jwt)
-    const id = req.body.user_id;
+    // const id = req.body.user_id;
+		const queryObject = url.parse(req.url, true).query;
+		const id = queryObject.user_id;
 
     try {
 
@@ -58,7 +62,7 @@ const getUserInfo = async(req, res, next) => {
         console.log("Trying to connect to gateway...")
         await gateway.connect(ccp, {
             wallet,
-            identity: 'iotFedsAdmin',
+            identity: id,
             discovery: { enabled: true, asLocalhost: true } // using asLocalhost as this gateway is using a fabric network deployed locally
         });
         console.log("Connected!!!")
@@ -66,16 +70,25 @@ const getUserInfo = async(req, res, next) => {
         // Build a network instance based on the channel where the smart contract is deployed
         const network = await gateway.getNetwork(channelName);
 
+        // const contract2 = network.getContract(chaincodeName2);
+        // let result3 = await contract2.evaluateTransaction('ClientAccountID');
+
+        // console.log('\n--> Submit Transaction: BalanceOf, account balance');
+        // let result4 = await contract2.evaluateTransaction('BalanceOf',result3);
+
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
 
+        // console.log('\n--> Submit Transaction: UpdateUserBalance updates the balance of the input user by the input fee');
+        // await contract.submitTransaction('UpdateUserBalance', id, result4);
+        // console.log('*** Result: committed');
 
 				console.log('\n--> Evaluate Transaction: ReadUser, function returns user attributes');
 				result = await contract.evaluateTransaction('ReadUser', id);
 				console.log(`*** Result: ${prettyJSONString(result.toString())}`);
 
 
-        res.status(200).send(result);
+        res.status(200).send(JSON.parse(result));
 
     //finally {
         // Disconnect from the gateway when the application is closing
@@ -89,7 +102,7 @@ const getUserInfo = async(req, res, next) => {
 
         console.log('User info access failed with error: '+error);
 
-        res.status(403).send('Access failed ...')
+        res.status(403).send({error: 'Access failed: '+error})
 
 
     }

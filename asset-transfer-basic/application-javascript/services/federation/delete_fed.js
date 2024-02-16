@@ -9,7 +9,8 @@ const { buildCCPOrg1, buildWallet } = require('../../../../test-application/java
 
 const channelName = 'mychannel';
 const chaincodeName = 'federationsmanage';
-const mspOrg1 = 'iotfedsMSP';
+//const chaincodeName2 = 'basic';
+//const mspOrg1 = 'iotfedsMSP';
 
 
 const walletPath = path.join(__dirname,'../..','wallet');
@@ -65,17 +66,24 @@ const deleteFed = async(req, res, next) => {
 
         // Get the contract from the network.
         const contract = network.getContract(chaincodeName);
+        //const contract2 = network.getContract(chaincodeName2);
 
+        // console.log('\n--> Submit Transaction: DeleteUser, deletes user with ID');
+        // await contract2.submitTransaction('DeleteUser', fed_id);
+        // console.log('*** Result: committed');
 
         console.log('\n--> Submit Transaction: DeleteFed, deletes federation with ID');
-        result = await contract.submitTransaction('DeleteFed', fed_id, request_user_id);
+        let result = await contract.submitTransaction('DeleteFed', fed_id, request_user_id);
         console.log('*** Result: committed');
         if (`${result}` !== '') {
             console.log(`*** Result: ${prettyJSONString(result.toString())}`);
         }
+        // var fs = require('fs');
+        // var filePath = `./wallet/${fed_id}.id`; 
+        // fs.unlinkSync(filePath);
 
 
-        res.status(200).send(result);
+        res.status(200).send(JSON.parse(result));
 				// res.status(200).send(result);
 
     //finally {
@@ -90,7 +98,7 @@ const deleteFed = async(req, res, next) => {
 
         console.log('FEderation deletion failed with error: '+error);
 
-        res.status(400).send('Deletion failed ...')
+        res.status(400).send({error: 'Deletion failed: '+error})
 
 
     }
